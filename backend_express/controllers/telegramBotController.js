@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-// import { getSession, setSession } from "../utils/redisUtils.js";
+import { getSession, setSession } from "../utils/redisUtils.js";
 import {
   sendMessage,
   downloadTelegramFile,
@@ -13,8 +13,7 @@ import { Case } from "../schemas/caseSchema.js";
  * Initialize or get session from Redis
  */
 async function getOrCreateSession(chatId) {
-  // let session = await getSession(chatId);
-  let session = null;
+  let session = await getSession(chatId);
 
   if (!session) {
     session = {
@@ -26,7 +25,7 @@ async function getOrCreateSession(chatId) {
       fullDocs: [],
       caseID: null,
     };
-    // await setSession(chatId, session);
+    await setSession(chatId, session);
   }
 
   return session;
@@ -36,10 +35,9 @@ async function getOrCreateSession(chatId) {
  * Update session in Redis
  */
 async function updateSession(chatId, updates) {
-  // const session = await getSession(chatId);
-  const session = {};
+  const session = await getSession(chatId);
   const updatedSession = { ...session, ...updates };
-  // await setSession(chatId, updatedSession);
+  await setSession(chatId, updatedSession);
   return updatedSession;
 }
 
@@ -59,9 +57,9 @@ async function handleGreeting(chatId, text) {
   if (lowerText === "hi" || lowerText === "hello") {
     await sendMessage(chatId, BOT_MESSAGES.WELCOME);
     await sendMessage(chatId, BOT_MESSAGES.REQUEST_LAWYER_ID);
-    // await updateSession(chatId, {
-    //   state: BOT_STATES.WAITING_FOR_LAWYER_ID,
-    // });
+    await updateSession(chatId, {
+      state: BOT_STATES.WAITING_FOR_LAWYER_ID,
+    });
   } else {
     await sendMessage(chatId, BOT_MESSAGES.INVALID_GREETING);
   }
@@ -76,10 +74,10 @@ async function handleLawyerId(chatId, text) {
     return;
   }
 
-  // await updateSession(chatId, {
-  //   lawyerID: text.trim(),
-  //   state: BOT_STATES.WAITING_FOR_JUDGE_ID,
-  // });
+  await updateSession(chatId, {
+    lawyerID: text.trim(),
+    state: BOT_STATES.WAITING_FOR_JUDGE_ID,
+  });
   await sendMessage(chatId, BOT_MESSAGES.REQUEST_JUDGE_ID);
 }
 
@@ -92,10 +90,10 @@ async function handleJudgeId(chatId, text) {
     return;
   }
 
-  // await updateSession(chatId, {
-  //   judgeID: text.trim(),
-  //   state: BOT_STATES.WAITING_FOR_USER_ID,
-  // });
+  await updateSession(chatId, {
+    judgeID: text.trim(),
+    state: BOT_STATES.WAITING_FOR_USER_ID,
+  });
   await sendMessage(chatId, BOT_MESSAGES.REQUEST_USER_ID);
 }
 
@@ -108,10 +106,10 @@ async function handleUserId(chatId, text) {
     return;
   }
 
-  // await updateSession(chatId, {
-  //   userID: text.trim(),
-  //   state: BOT_STATES.WAITING_FOR_EVIDENCES,
-  // });
+  await updateSession(chatId, {
+    userID: text.trim(),
+    state: BOT_STATES.WAITING_FOR_EVIDENCES,
+  });
   await sendMessage(chatId, BOT_MESSAGES.REQUEST_EVIDENCES);
 }
 
@@ -119,8 +117,7 @@ async function handleUserId(chatId, text) {
  * Handle evidence documents
  */
 async function handleEvidences(chatId, text, document) {
-  // const session = await getSession(chatId);
-  const session = { evidences: [] };
+  const session = await getSession(chatId);
 
   if (text && text.trim().toUpperCase() === "DONE") {
     if (session.evidences.length === 0) {
@@ -131,9 +128,9 @@ async function handleEvidences(chatId, text, document) {
       return;
     }
 
-    // await updateSession(chatId, {
-    //   state: BOT_STATES.WAITING_FOR_FULL_DOCS,
-    // });
+    await updateSession(chatId, {
+      state: BOT_STATES.WAITING_FOR_FULL_DOCS,
+    });
     await sendMessage(chatId, BOT_MESSAGES.REQUEST_FULL_DOCS);
     return;
   }
@@ -158,7 +155,7 @@ async function handleEvidences(chatId, text, document) {
 
       const file = await downloadTelegramFile(document.file_id);
       const evidences = [...session.evidences, file];
-      // await updateSession(chatId, { evidences });
+      await updateSession(chatId, { evidences });
       await sendMessage(chatId, BOT_MESSAGES.DOCUMENT_RECEIVED);
     } catch (error) {
       console.error("Error downloading evidence:", error);
@@ -179,8 +176,7 @@ async function handleEvidences(chatId, text, document) {
  * Handle full case documents
  */
 async function handleFullDocs(chatId, text, document) {
-  // const session = await getSession(chatId);
-  const session = { fullDocs: [] };
+  const session = await getSession(chatId);
 
   if (text && text.trim().toUpperCase() === "DONE") {
     if (session.fullDocs.length === 0) {
@@ -191,9 +187,9 @@ async function handleFullDocs(chatId, text, document) {
       return;
     }
 
-    // await updateSession(chatId, {
-    //   state: BOT_STATES.PROCESSING,
-    // });
+    await updateSession(chatId, {
+      state: BOT_STATES.PROCESSING,
+    });
 
     // Process the case
     await processCase(chatId);
@@ -220,7 +216,7 @@ async function handleFullDocs(chatId, text, document) {
 
       const file = await downloadTelegramFile(document.file_id);
       const fullDocs = [...session.fullDocs, file];
-      // await updateSession(chatId, { fullDocs });
+      await updateSession(chatId, { fullDocs });
       await sendMessage(chatId, BOT_MESSAGES.DOCUMENT_RECEIVED);
     } catch (error) {
       console.error("Error downloading document:", error);
@@ -242,8 +238,7 @@ async function handleFullDocs(chatId, text, document) {
  */
 async function processCase(chatId) {
   try {
-    // const session = await getSession(chatId);
-    const session = { evidences: [], fullDocs: [] };
+    const session = await getSession(chatId);
     await sendMessage(chatId, BOT_MESSAGES.PROCESSING_CASE);
 
     // Generate case ID
@@ -298,22 +293,22 @@ Your case has been successfully created and sent for processing!
     cleanupTempFiles([...session.evidences, ...session.fullDocs]);
 
     // Update session to completed and reset
-    // await updateSession(chatId, {
-    //   state: BOT_STATES.COMPLETED,
-    //   caseID,
-    // });
+    await updateSession(chatId, {
+      state: BOT_STATES.COMPLETED,
+      caseID,
+    });
 
     // Reset session for new case
     setTimeout(async () => {
-      // await setSession(chatId, {
-      //   state: BOT_STATES.WAITING_FOR_GREETING,
-      //   lawyerID: null,
-      //   judgeID: null,
-      //   userID: null,
-      //   evidences: [],
-      //   fullDocs: [],
-      //   caseID: null,
-      // });
+      await setSession(chatId, {
+        state: BOT_STATES.WAITING_FOR_GREETING,
+        lawyerID: null,
+        judgeID: null,
+        userID: null,
+        evidences: [],
+        fullDocs: [],
+        caseID: null,
+      });
       await sendMessage(
         chatId,
         "You can start a new case by sending 'hi' or 'hello'."
@@ -324,16 +319,15 @@ Your case has been successfully created and sent for processing!
     await sendMessage(chatId, BOT_MESSAGES.ERROR);
 
     // Clean up files on error
-    // const session = await getSession(chatId);
-    const session = { evidences: [], fullDocs: [] };
+    const session = await getSession(chatId);
     if (session) {
       cleanupTempFiles([...session.evidences, ...session.fullDocs]);
     }
 
     // Reset session
-    // await updateSession(chatId, {
-    //   state: BOT_STATES.WAITING_FOR_GREETING,
-    // });
+    await updateSession(chatId, {
+      state: BOT_STATES.WAITING_FOR_GREETING,
+    });
   }
 }
 
@@ -353,8 +347,7 @@ export async function handleWebhook(req, res) {
     const document = message.document;
 
     // Get or create session
-    // const session = await getOrCreateSession(chatId);
-    const session = { state: BOT_STATES.WAITING_FOR_GREETING };
+    const session = await getOrCreateSession(chatId);
 
     // State machine
     switch (session.state) {
@@ -402,9 +395,9 @@ export async function handleWebhook(req, res) {
         break;
 
       default:
-        // await updateSession(chatId, {
-        //   state: BOT_STATES.WAITING_FOR_GREETING,
-        // });
+        await updateSession(chatId, {
+          state: BOT_STATES.WAITING_FOR_GREETING,
+        });
         await sendMessage(chatId, BOT_MESSAGES.INVALID_GREETING);
     }
 

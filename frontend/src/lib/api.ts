@@ -1,7 +1,8 @@
 // Frontend API Client - calls remote backend endpoints
 // This file contains NO backend logic, only fetch() calls to cloud API
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 // ============================================================================
 // TYPE DEFINITIONS (matching Mongoose schema exactly)
@@ -13,7 +14,14 @@ export interface Case {
   title: string;
   description: string;
   category: string;
-  status: "Filed" | "Under Review" | "Hearing Scheduled" | "Judgment Pending" | "Closed" | "Active" | "Pending Review";
+  status:
+    | "Filed"
+    | "Under Review"
+    | "Hearing Scheduled"
+    | "Judgment Pending"
+    | "Closed"
+    | "Active"
+    | "Pending Review";
   filingDate: string;
   lastUpdated: string;
   assignedJudge?: string;
@@ -65,12 +73,12 @@ export interface Case {
       lastAnalyzed: string;
     };
   };
-  
+
   // Convenience properties for frontend (flattened access)
-  id: string;  // alias for _id
-  court: string;  // alias for public.court
-  nextHearing?: string;  // alias for public.nextHearing
-  parties?: { petitioner: string; respondent: string };  // alias for public.parties
+  id: string; // alias for _id
+  court: string; // alias for public.court
+  nextHearing?: string; // alias for public.nextHearing
+  parties?: { petitioner: string; respondent: string }; // alias for public.parties
 }
 
 export interface Document {
@@ -86,13 +94,13 @@ export interface Document {
     fileSize: number;
     mimeType: string;
   };
-  
+
   // Convenience properties for frontend (flattened access)
-  id: string;  // alias for _id
-  name: string;  // alias for title
-  uploadedAt: string;  // alias for uploadDate
-  size: string;  // formatted fileSize from metadata
-  category?: string;  // optional classification category
+  id: string; // alias for _id
+  name: string; // alias for title
+  uploadedAt: string; // alias for uploadDate
+  size: string; // formatted fileSize from metadata
+  category?: string; // optional classification category
 }
 
 export interface Analytics {
@@ -131,13 +139,10 @@ export interface User {
  */
 export async function fetchCases(): Promise<Case[]> {
   try {
-    const token = localStorage.getItem("accessToken");
     const response = await fetch(`${API_BASE_URL}/api/cases`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include", // Send cookies with request
     });
-    
+
     if (!response.ok) {
       if (response.status === 403) {
         // Not authorized, maybe token expired or not present
@@ -147,7 +152,7 @@ export async function fetchCases(): Promise<Case[]> {
       }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.cases || [];
   } catch (error) {
@@ -162,18 +167,15 @@ export async function fetchCases(): Promise<Case[]> {
  */
 export async function fetchAnalytics(): Promise<Analytics> {
   try {
-    const token = localStorage.getItem("accessToken");
     // TODO: Connect to your cloud backend endpoint
     const response = await fetch(`${API_BASE_URL}/analytics`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include", // Send cookies with request
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.analytics;
   } catch (error) {
@@ -202,12 +204,14 @@ export async function fetchAnalytics(): Promise<Analytics> {
 export async function fetchCaseDocuments(caseId: string): Promise<Document[]> {
   try {
     // TODO: Connect to your cloud backend endpoint
-    const response = await fetch(`${API_BASE_URL}/cases/${caseId}/documents`);
-    
+    const response = await fetch(`${API_BASE_URL}/cases/${caseId}/documents`, {
+      credentials: "include", // Send cookies with request
+    });
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.documents || [];
   } catch (error) {
@@ -227,13 +231,14 @@ export async function createCase(caseData: Partial<Case>): Promise<Case> {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Send cookies with request
       body: JSON.stringify(caseData),
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.case;
   } catch (error) {
@@ -245,7 +250,10 @@ export async function createCase(caseData: Partial<Case>): Promise<Case> {
 /**
  * Update an existing case
  */
-export async function updateCase(caseId: string, updates: Partial<Case>): Promise<Case> {
+export async function updateCase(
+  caseId: string,
+  updates: Partial<Case>
+): Promise<Case> {
   try {
     // TODO: Connect to your cloud backend endpoint
     const response = await fetch(`${API_BASE_URL}/cases/${caseId}`, {
@@ -253,13 +261,14 @@ export async function updateCase(caseId: string, updates: Partial<Case>): Promis
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Send cookies with request
       body: JSON.stringify(updates),
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.case;
   } catch (error) {
@@ -271,22 +280,27 @@ export async function updateCase(caseId: string, updates: Partial<Case>): Promis
 /**
  * Upload a document to a case
  */
-export async function uploadDocument(caseId: string, file: File, metadata: any): Promise<Document> {
+export async function uploadDocument(
+  caseId: string,
+  file: File,
+  metadata: any
+): Promise<Document> {
   try {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("metadata", JSON.stringify(metadata));
-    
+
     // TODO: Connect to your cloud backend endpoint
     const response = await fetch(`${API_BASE_URL}/cases/${caseId}/documents`, {
       method: "POST",
+      credentials: "include", // Send cookies with request
       body: formData,
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.document;
   } catch (error) {
@@ -313,16 +327,17 @@ export async function sendAICounselMessage(
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // Send cookies with request
       body: JSON.stringify({
         message,
         context,
       }),
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.response;
   } catch (error) {
@@ -331,7 +346,3 @@ export async function sendAICounselMessage(
     return "I apologize, but I'm unable to process your request at the moment. Please try again later or contact support.";
   }
 }
-
-
-
-

@@ -1,7 +1,7 @@
 import { User } from "../schemas/userSchema.js";
 import jwt from "jsonwebtoken";
 
-
+const cookieOptions = { httpOnly: true, secure: true };
 
 export const asyncHandler = (fn) => {
   return async (req, res, next) => {
@@ -81,13 +81,11 @@ const loginUser = asyncHandler(async (req, res) => {
     refreshToken: refreshToken,
   });
 
-  // Send tokens in response body
-  res.json({
-    user: user,
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-    message: "User logged in successfully"
-  });
+  // Send Refresh and Access Token as httpOnly cookies
+  res
+    .cookie("refreshToken", refreshToken, cookieOptions)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .json({ user: user, message: "User logged in successfully" });
 });
 
 // Logout User
