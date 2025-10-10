@@ -137,6 +137,22 @@ async function handleEvidences(chatId, text, document) {
 
   if (document) {
     try {
+      // Check if this file_id has already been processed
+      const existingFile = session.evidences.find(
+        (f) => f.fileId === document.file_id
+      );
+
+      if (existingFile) {
+        console.log(
+          `Skipping duplicate evidence file: ${document.file_id} (${document.file_name})`
+        );
+        await sendMessage(
+          chatId,
+          "⚠️ This file has already been uploaded. Send a different file or type 'DONE'."
+        );
+        return;
+      }
+
       const file = await downloadTelegramFile(document.file_id);
       const evidences = [...session.evidences, file];
       await updateSession(chatId, { evidences });
@@ -182,6 +198,22 @@ async function handleFullDocs(chatId, text, document) {
 
   if (document) {
     try {
+      // Check if this file_id has already been processed
+      const existingFile = session.fullDocs.find(
+        (f) => f.fileId === document.file_id
+      );
+
+      if (existingFile) {
+        console.log(
+          `Skipping duplicate full doc file: ${document.file_id} (${document.file_name})`
+        );
+        await sendMessage(
+          chatId,
+          "⚠️ This file has already been uploaded. Send a different file or type 'DONE'."
+        );
+        return;
+      }
+
       const file = await downloadTelegramFile(document.file_id);
       const fullDocs = [...session.fullDocs, file];
       await updateSession(chatId, { fullDocs });
@@ -310,7 +342,7 @@ export async function handleWebhook(req, res) {
       return res.status(200).send("No message in webhook");
     }
 
-    const chatId = message.chat.id;
+    const chatId = message.from.id;
     const text = message.text;
     const document = message.document;
 

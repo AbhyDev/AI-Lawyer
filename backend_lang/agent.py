@@ -18,7 +18,7 @@ import fitz  # PyMuPDF
 
 load_dotenv()
 llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash", 
+    model="gemini-2.5-flash", 
     google_api_key=os.getenv("GEMINI_API_KEY"),
 )
 
@@ -39,8 +39,11 @@ class EvidenceClass(TypedDict, total=False):
     expert_opinions: NotRequired[List[str]]
     physical_object_descriptions: NotRequired[List[str]]
  
+# storage for tool-collected data (avoid name collision with tool objects)
+evidence_store: EvidenceClass = {}
+
 @tool
-def evidence(evidences: EvidenceClass) -> str:
+def save_evidence(evidences: EvidenceClass) -> str:
     """
     Use this tool to save a categorized summary of all evidence found in the documents.
 
@@ -55,8 +58,8 @@ def evidence(evidences: EvidenceClass) -> str:
             - digital_communications: Add transcripts or summaries of emails, WhatsApp chats, or SMS.
             - forensic_reports: Describe findings from DNA, fingerprint, or ballistics reports.
     """
-    global evidence
-    evidence = evidences
+    global evidence_store
+    evidence_store = evidences
     return "Successfully Added the Evidences to Database"
 
 class PublicInfoClass(TypedDict, total=False):
@@ -66,10 +69,10 @@ class PublicInfoClass(TypedDict, total=False):
     case_status: NotRequired[str] 
     case_summary: NotRequired[str]
     timeline_of_proceedings: NotRequired[List[Dict[str, str]]]
-public = PublicInfoClass()
+public_store: PublicInfoClass = {}
 
 @tool 
-def public(public_info: PublicInfoClass)->str:
+def save_public(public_info: PublicInfoClass)->str:
     """
     Use this tool to save all publicly available information about a legal case.
 
@@ -88,8 +91,8 @@ def public(public_info: PublicInfoClass)->str:
     Returns:
         A success message indicating that the publicly releasable information was added to the database.
     """
-    global public
-    public = public_info
+    global public_store
+    public_store = public_info
     return "Successfully Added the public information to Database"
 
 class PersonDetail(TypedDict, total=False):
@@ -106,10 +109,10 @@ class PrivateInfoClass(TypedDict, total=False):
     privileged_communications: NotRequired[Dict[str, str]]  #Key is betwen whom communication happened, value is communication summary
     legal_strategy_and_notes: NotRequired[str]   # Internal memos, argument outlines, case strategy, legal research notes.
 
-privateinfo = PrivateInfoClass()
+private_store: PrivateInfoClass = {}
 
 @tool
-def private(private_info: PrivateInfoClass) -> str:
+def save_private(private_info: PrivateInfoClass) -> str:
     """
     Use this tool to save confidential and privileged information not for public disclosure.
 
@@ -123,11 +126,11 @@ def private(private_info: PrivateInfoClass) -> str:
             - privileged_communications: Record summaries of confidential talks. The dictionary key should be the parties involved (e.g., "Lawyer-Client John Doe"), and the value should be a summary of the communication.
             - legal_strategy_and_notes: Summarize internal memos, argument outlines, and case strategy notes.
     """
-    global privateinfo
-    privateinfo = private_info
+    global private_store
+    private_store = private_info
     return "Successfully Added the private information to Database"
 
-tools = [evidence, public, private]
+tools = [save_evidence, save_public, save_private]
 llm_withtools = llm.bind_tools(tools=tools)
 
 def ClassyAgent(state: AgentState)->AgentState:
@@ -261,13 +264,13 @@ def classified_data(incoming_data: str)->str:
         "evidence" : string_dig_evidence, 
         "Full_docs" : string_dig_rest
     })
+    # use the storage variables that are plain Python structures (not tool objects)
     finalised = {
         "CaseID" : Database["CaseID"],
         "LawyerID": Database["LawyerID"],
         "JudgeID" : Database["JudgeID"],
-        "Evidence" : evidence,
-        "Public" : public,
-        "Private" : private,
-
+        "Evidence" : evidence_store,
+        "Public" : public_store,
+        "Private" : private_store,
     }
     return json.dumps(finalised)

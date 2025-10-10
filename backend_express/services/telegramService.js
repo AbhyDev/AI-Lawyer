@@ -44,7 +44,7 @@ export async function sendMessage(chatId, text) {
 /**
  * Download a file from Telegram
  * @param {string} fileId - The Telegram file_id
- * @returns {Promise<{filePath: string, buffer: Buffer}>} - The local file path and buffer
+ * @returns {Promise<{filePath: string, buffer: Buffer, fileId: string}>} - The local file path, buffer, and original file_id
  */
 export async function downloadTelegramFile(fileId) {
   try {
@@ -75,6 +75,7 @@ export async function downloadTelegramFile(fileId) {
       buffer: buffer,
       fileName: fileName,
       originalName: path.basename(filePath),
+      fileId: fileId, // Include the original Telegram file_id for deduplication
     };
   } catch (error) {
     console.error("Error downloading file:", error);
@@ -93,50 +94,118 @@ export async function sendToProcessingServer(data, files = []) {
     const formData = new FormData();
 
     // Add metadata
-    formData.append("caseID", data.caseID);
-    formData.append("lawyerID", data.lawyerID);
-    formData.append("judgeID", data.judgeID);
-    formData.append("userID", data.userID);
+    formData.append("CaseID", data.caseID);
+    formData.append("LawyerID", data.lawyerID);
+    formData.append("JudgeID", data.judgeID);
+    formData.append("UserID", data.userID);
 
-    // Add evidence files
+    console.log(
+      `Preparing to send ${files.evidences?.length || 0} evidence files and ${
+        files.fullDocs?.length || 0
+      } full doc files`
+    );
+
+    // Add evidence files - all with the same field name "Evidence"
+    // This allows FastAPI to receive them as a list
     if (files.evidences && files.evidences.length > 0) {
+      console.log("Evidence files to send:");
       files.evidences.forEach((file, index) => {
-        formData.append(
-          `evidence_${index}`,
-          fs.createReadStream(file.filePath),
-          {
-            filename: file.originalName || file.fileName,
-          }
+        console.log(
+          `  [${index}] fileId: ${file.fileId}, fileName: ${file.fileName}, originalName: ${file.originalName}`
         );
+      });
+
+      files.evidences.forEach((file, index) => {
+        try {
+          const filename =
+            file.originalName || file.fileName || `evidence_${index}`;
+          if (file.filePath && fs.existsSync(file.filePath)) {
+            console.log(
+              `Attaching evidence file: ${filename} from ${file.filePath}`
+            );
+            formData.append(
+              "Evidence", // Same field name for all evidence files
+              fs.createReadStream(file.filePath),
+              {
+                filename: filename,
+              }
+            );
+          } else if (file.buffer) {
+            // buffer may be a Buffer or arraybuffer; ensure Buffer
+            const buf = Buffer.isBuffer(file.buffer)
+              ? file.buffer
+              : Buffer.from(file.buffer);
+            console.log(`Attaching evidence file from buffer: ${filename}`);
+            formData.append("Evidence", buf, {
+              filename: filename,
+            });
+          } else {
+            console.warn(
+              `Evidence file missing: ${file.filePath} and no buffer available - skipping`
+            );
+          }
+        } catch (err) {
+          console.error("Error attaching evidence file to formdata:", err);
+        }
       });
     }
 
-    // Add full document files
+    // Add full document files - all with the same field name "Full_docs"
+    // This allows FastAPI to receive them as a list
     if (files.fullDocs && files.fullDocs.length > 0) {
+      console.log("Full doc files to send:");
       files.fullDocs.forEach((file, index) => {
-        formData.append(
-          `full_doc_${index}`,
-          fs.createReadStream(file.filePath),
-          {
-            filename: file.originalName || file.fileName,
-          }
+        console.log(
+          `  [${index}] fileId: ${file.fileId}, fileName: ${file.fileName}, originalName: ${file.originalName}`
         );
+      });
+
+      files.fullDocs.forEach((file, index) => {
+        try {
+          const filename =
+            file.originalName || file.fileName || `full_doc_${index}`;
+          if (file.filePath && fs.existsSync(file.filePath)) {
+            console.log(
+              `Attaching full doc file: ${filename} from ${file.filePath}`
+            );
+            formData.append(
+              "Full_docs", // Same field name for all full doc files
+              fs.createReadStream(file.filePath),
+              {
+                filename: filename,
+              }
+            );
+          } else if (file.buffer) {
+            const buf = Buffer.isBuffer(file.buffer)
+              ? file.buffer
+              : Buffer.from(file.buffer);
+            console.log(`Attaching full doc file from buffer: ${filename}`);
+            formData.append("Full_docs", buf, {
+              filename: filename,
+            });
+          } else {
+            console.warn(
+              `Full doc missing: ${file.filePath} and no buffer available - skipping`
+            );
+          }
+        } catch (err) {
+          console.error("Error attaching full_doc file to formdata:", err);
+        }
       });
     }
 
-    // Send to processing server (placeholder URL for now)
+    // Send to processing server
     const processingServerUrl =
       process.env.PROCESSING_SERVER_URL || "http://localhost:8000/process";
 
-    console.log("Processing server URL:", processingServerUrl);
-    console.log("Form data:", formData);
-    console.log("Form data headers:", formData.getHeaders());
+    console.log(`Sending case data to: ${processingServerUrl}`);
     const response = await axios.post(processingServerUrl, formData, {
       headers: {
         ...formData.getHeaders(),
       },
     });
 
+    console.log("Successfully sent data to processing server");
     return response.data;
   } catch (error) {
     console.error("Error sending to processing server:", error.message);
