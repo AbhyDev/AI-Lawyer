@@ -128,6 +128,9 @@ export async function sendToProcessingServer(data, files = []) {
     const processingServerUrl =
       process.env.PROCESSING_SERVER_URL || "http://localhost:8000/process";
 
+    console.log("Processing server URL:", processingServerUrl);
+    console.log("Form data:", formData);
+    console.log("Form data headers:", formData.getHeaders());
     const response = await axios.post(processingServerUrl, formData, {
       headers: {
         ...formData.getHeaders(),
