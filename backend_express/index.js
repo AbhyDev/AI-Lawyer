@@ -1,59 +1,45 @@
 import "dotenv/config";
 import express from "express";
-import axios from "axios";
 import { connectToMongoDB } from "./utils/mongoUtils.js";
 import { connectToRedis } from "./utils/redisUtils.js";
+import authRouter from "./routes/authRouter.js";
+import telegramRouter from "./routes/telegramRouter.js";
 
 const app = express();
-const BASE_URL = process.env.TELEGRAM_BASE_URL;
 
-async function sendTelegramRequest(route, params = {}) {
-  try {
-    const response = await axios.get(`${BASE_URL}/${route}`, {
-      params: params,
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Telegram API Error:", error.response?.data || error.message);
-    throw error;
-  }
-}
-
+// Middleware
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
+// Routes
+app.use("/auth", authRouter);
+app.use("/telegram", telegramRouter);
 
-app.post("/webhook", (req, res) => {
-  //   console.log(req.body);
-  const { message } = req.body;
-  const text = message.text;
-  const file_id = message.document?.file_id;
-  const chat_id = message.chat.id;
-  if (text) {
-    sendTelegramRequest("sendMessage", {
-      chat_id: chat_id,
-      text: `You said: ${text}`,
-    });
-  }
-  if (file_id) {
-    sendTelegramRequest("sendMessage", {
-      chat_id: chat_id,
-      text: `You sent a document with file_id: ${file_id}`,
-    });
-  }
-  res.send("Webhook received!");
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "AI Lawyer Backend Server is running",
+    endpoints: {
+      auth: "/auth",
+      telegram: "/telegram",
+    },
+  });
 });
 
 async function startServer() {
-  const PORT = process.env.PORT;
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  });
+  const PORT = process.env.PORT || 3000;
 
+  // Connect to databases
   await connectToMongoDB();
   await connectToRedis();
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log("Available endpoints:");
+    console.log(`  - GET  /`);
+    console.log(`  - POST /telegram/webhook`);
+    console.log(`  - GET  /telegram/health`);
+    console.log(`  - *    /auth/*`);
+  });
 }
 
 startServer();
