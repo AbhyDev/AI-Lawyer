@@ -1,0 +1,30 @@
+{
+  "name": "ai-lawyer-udaan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "prod": "node index.js",
+    "tunnel": "node ngrok-setup.js",
+    "dev:tunnel": "concurrently \"npm run dev\" \"npm run tunnel\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@ngrok/ngrok": "^1.5.2",
+    "axios": "^1.12.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.1",
+    "redis": "^5.8.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.37.0",
+    "globals": "^16.4.0"
+  }
+}
