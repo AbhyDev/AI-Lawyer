@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import axios from "axios";
+import { connectToMongoDB } from "./utils/mongoUtils.js";
+import { connectToRedis } from "./utils/redisUtils.js";
 
 const app = express();
 const BASE_URL = process.env.TELEGRAM_BASE_URL;
@@ -49,6 +51,9 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
+
+  await connectToMongoDB();
+  await connectToRedis();
 }
 
 startServer();
