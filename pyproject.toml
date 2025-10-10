@@ -25,4 +25,5 @@ dependencies = [
     "pillow>=11.3.0",
     "accelerate>=1.10.1",
     "easyocr>=1.7.2",
+    "pymupdf>=1.26.5",
 ]
