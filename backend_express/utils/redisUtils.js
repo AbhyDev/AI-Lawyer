@@ -35,7 +35,7 @@ export const getSession = async (chatID) => {
 export const setSession = async (chatID, sessionData) => {
   try {
     await redisClient.set(`session:${chatID}`, JSON.stringify(sessionData), {
-      EX: 180, // Session expires in 180 seconds
+      EX: 3600, // Session expires in 1 hour (3600 seconds)
     });
     return true;
   } catch (err) {

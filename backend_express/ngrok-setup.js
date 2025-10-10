@@ -9,7 +9,7 @@ const startNgrok = async () => {
       proto: "http",
     });
 
-    console.log(`Webhook URL: ${listener.url()}/webhook`);
+    console.log(`Webhook URL: ${listener.url()}/telegram/webhook`);
     console.log("Press Ctrl+C to stop the tunnel");
 
     // Handle Ctrl+C / SIGINT
