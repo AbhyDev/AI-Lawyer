@@ -5,6 +5,7 @@ import { connectToRedis } from "./utils/redisUtils.js";
 import authRouter from "./routes/authRouter.js";
 import telegramRouter from "./routes/telegramRouter.js";
 import caseRouter from "./routes/caseRouter.js";
+import ragRouter from "./routes/ragRouter.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 app.use("/auth", authRouter);
 app.use("/telegram", telegramRouter);
 app.use("/api/cases", caseRouter);
+app.use("/api/rag", ragRouter);
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -27,6 +29,8 @@ app.get("/", (req, res) => {
     endpoints: {
       auth: "/auth",
       telegram: "/telegram",
+      cases: "/api/cases",
+      rag: "/api/rag",
     },
   });
 });

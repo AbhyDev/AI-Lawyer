@@ -346,3 +346,53 @@ export async function sendAICounselMessage(
     return "I apologize, but I'm unable to process your request at the moment. Please try again later or contact support.";
   }
 }
+
+/**
+ * Query the RAG (Retrieval-Augmented Generation) system
+ * This uses the new FastAPI RAG backend with vector database search
+ *
+ * @param query - The natural language question to ask
+ * @returns Promise<string> - The AI-generated response based on case documents
+ */
+export async function queryRAG(query: string): Promise<string> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/rag`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Send cookies with request (for JWT auth)
+      body: JSON.stringify({ query }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.error || `HTTP error! status: ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.error || "RAG query failed");
+    }
+
+    return data.response;
+  } catch (error) {
+    console.error("Error querying RAG system:", error);
+
+    // Provide helpful error messages based on error type
+    if (error instanceof Error) {
+      if (error.message.includes("unavailable")) {
+        return "The AI analysis service is currently unavailable. Please try again later.";
+      }
+      if (error.message.includes("timed out")) {
+        return "Your query is taking longer than expected. Please try a simpler question or try again later.";
+      }
+    }
+
+    // Generic fallback
+    return "I apologize, but I'm unable to process your request at the moment. Please try again later.";
+  }
+}

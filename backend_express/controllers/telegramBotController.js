@@ -8,6 +8,7 @@ import {
 } from "../services/telegramService.js";
 import { BOT_STATES, BOT_MESSAGES } from "../constants/botStates.js";
 import { Case } from "../schemas/caseSchema.js";
+import { loadCaseToRAG } from "./ragController.js";
 
 /**
  * Initialize or get session from Redis
@@ -271,6 +272,16 @@ async function processCase(chatId) {
     });
 
     await newCase.save();
+
+    // Load case into RAG vector store (async, non-blocking)
+    // We don't await this to avoid blocking the user response
+    loadCaseToRAG(caseID).catch((error) => {
+      console.error(
+        `[RAG] Failed to load case ${caseID} to vector store:`,
+        error
+      );
+      // Continue execution even if RAG loading fails
+    });
 
     // Send success message
     const summaryMessage = `
