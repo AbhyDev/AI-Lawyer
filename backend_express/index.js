@@ -4,17 +4,21 @@ import cookieParser from "cookie-parser";
 
 // Environment variable check
 const requiredEnvVars = [
-  'MONGODB_URI',
-  'ACCESS_TOKEN_SECRET',
-  'ACCESS_TOKEN_EXPIRY',
-  'REFRESH_TOKEN_SECRET',
-  'REFRESH_TOKEN_EXPIRY',
+  "MONGODB_URI",
+  "ACCESS_TOKEN_SECRET",
+  "ACCESS_TOKEN_EXPIRY",
+  "REFRESH_TOKEN_SECRET",
+  "REFRESH_TOKEN_EXPIRY",
 ];
 
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
-  console.error(`Error: Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  console.error(
+    `Error: Missing required environment variables: ${missingEnvVars.join(
+      ", "
+    )}`
+  );
   process.exit(1);
 }
 import { connectToMongoDB } from "./utils/mongoUtils.js";
@@ -23,20 +27,24 @@ import authRouter from "./routes/authRouter.js";
 import telegramRouter from "./routes/telegramRouter.js";
 import caseRouter from "./routes/caseRouter.js";
 import ragRouter from "./routes/ragRouter.js";
-import cors from 'cors';
+import cors from "cors";
 
 const app = express();
 app.use(cookieParser());
 
 // Middleware
-app.use(cors({ origin: 'http://localhost:8080', credentials: true }));
+app.use(cors({ origin: "http://localhost:8080", credentials: true }));
 app.use(express.json());
 
 // Logger Middleware
 app.use((req, res, next) => {
   const originalSend = res.send;
   res.send = function (body) {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - Response Body:`);
+    console.log(
+      `[${new Date().toISOString()}] ${req.method} ${
+        req.originalUrl
+      } - Response Body:`
+    );
     try {
       // Try to parse and log JSON for better readability
       console.log(JSON.parse(body));
