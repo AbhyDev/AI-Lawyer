@@ -1,7 +1,7 @@
 // Frontend API Client - calls remote backend endpoints
 // This file contains NO backend logic, only fetch() calls to cloud API
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 // ============================================================================
 // TYPE DEFINITIONS (matching Mongoose schema exactly)

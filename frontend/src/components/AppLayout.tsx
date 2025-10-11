@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 interface AppLayoutProps {
   children: ReactNode;
   role?: "lawyer" | "judge" | "citizen";
+  pageTitle?: string;
 }
 
-const AppLayout = ({ children, role = "lawyer" }: AppLayoutProps) => {
+const AppLayout = ({ children, role = "lawyer", pageTitle }: AppLayoutProps) => {
   const location = useLocation();
   
   const navigation = [
@@ -89,6 +90,17 @@ const AppLayout = ({ children, role = "lawyer" }: AppLayoutProps) => {
           </nav>
         </div>
       </header>
+
+      {/* Page Title */}
+      {pageTitle && (
+        <div className="border-b border-border bg-card/50">
+          <div className="container mx-auto px-6 py-4">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-semibold">{pageTitle}</h1>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 custom-scrollbar">

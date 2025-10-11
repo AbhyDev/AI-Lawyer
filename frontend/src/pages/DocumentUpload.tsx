@@ -1,21 +1,33 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { 
   Scale, 
   Upload, 
   FileText,
   CheckCircle,
   AlertCircle,
-  X
+  X,
+  Trash2,
+  Plus
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import AppLayout from "@/components/AppLayout";
 
-const DocumentUpload = () => {
+function DocumentUpload() {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+  const userRole = currentUser.role || "lawyer";
+  const navigate = useNavigate();
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedType, setSelectedType] = useState("");
+  const [selectedCaseId, setSelectedCaseId] = useState("");
+  const [selectedCase, setSelectedCase] = useState<any>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
@@ -310,6 +322,6 @@ const DocumentUpload = () => {
       </main>
     </div>
   );
-};
+}
 
 export default DocumentUpload;

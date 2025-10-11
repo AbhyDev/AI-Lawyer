@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Scale, 
+  Scale,
   Send,
   MessageSquare,
   Bot,
@@ -15,8 +15,9 @@ import {
   Clock
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import AppLayout from "@/components/AppLayout";
 
-const AICounsel = () => {
+function AICounsel() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -76,24 +77,10 @@ The system will provide:
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center gap-3">
-            <Link to="/dashboard" className="flex items-center gap-2 text-primary hover:text-primary-hover transition-colors">
-              <Scale className="h-6 w-6" />
-              <span className="font-bold">UDAAN</span>
-            </Link>
-            <span className="text-muted-foreground">/</span>
-            <h1 className="text-xl font-semibold">AI Counsel</h1>
-          </div>
-        </div>
-      </header>
-
+    <AppLayout pageTitle="AI Counsel">
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-4 gap-6 h-[calc(100vh-12rem)]">
+      <main>
+        <div className="grid lg:grid-cols-4 gap-6 h-[calc(100vh-15rem)]">
           {/* Case Context Sidebar */}
           <div className="lg:col-span-1 space-y-4">
             <Card>
@@ -251,7 +238,7 @@ The system will provide:
           </div>
         </div>
       </main>
-    </div>
+    </AppLayout>
   );
 };
 

@@ -18,6 +18,7 @@ import Alerts from "./pages/Alerts";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AuthLayout from "./components/AuthLayout";
 
 const queryClient = new QueryClient();
 
@@ -32,16 +33,18 @@ const App = () => (
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard/lawyer" element={<LawyerDashboard />} />
-              <Route path="/dashboard/judge" element={<JudgeDashboard />} />
-              <Route path="/dashboard/citizen" element={<CitizenDashboard />} />
-              <Route path="/cases" element={<CaseFiles />} />
-              <Route path="/cases/:id" element={<CaseDetail />} />
-              <Route path="/upload" element={<DocumentUpload />} />
-              <Route path="/aicounsel" element={<AICounsel />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/alerts" element={<Alerts />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route element={<AuthLayout />}>
+                <Route path="/dashboard/lawyer" element={<LawyerDashboard />} />
+                <Route path="/dashboard/judge" element={<JudgeDashboard />} />
+                <Route path="/dashboard/citizen" element={<CitizenDashboard />} />
+                <Route path="/cases" element={<CaseFiles />} />
+                <Route path="/cases/:id" element={<CaseDetail />} />
+                <Route path="/upload" element={<DocumentUpload />} />
+                <Route path="/aicounsel" element={<AICounsel />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/alerts" element={<Alerts />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route>
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

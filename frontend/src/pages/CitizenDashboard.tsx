@@ -127,18 +127,12 @@ export default function CitizenDashboard() {
   };
 
   const navigate = useNavigate();
-  const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:3000/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (error) {
-      console.error("Logout failed:", error);
-    } finally {
-      localStorage.removeItem("currentUser");
-      navigate("/login");
-    }
+  
+  // Import the shared logout handler
+  const handleLogout = () => {
+    import("@/lib/auth").then(({ handleLogout }) => {
+      handleLogout(navigate);
+    });
   };
 
   return (

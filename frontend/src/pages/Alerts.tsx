@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Scale,
-  ArrowLeft,
   Calendar as CalendarIcon,
   Clock,
   MapPin,
@@ -13,9 +11,9 @@ import {
   ChevronRight,
   AlertCircle
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import AppLayout from "@/components/AppLayout";
 
-export default function Alerts() {
+function Alerts() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -80,42 +78,6 @@ export default function Alerts() {
       judge: "Hon'ble Justice S.K. Mehta",
       type: "Evidence Presentation",
       priority: "high"
-    },
-    {
-      id: "6",
-      caseNumber: "CIV/2024/120",
-      caseTitle: "Employment Dispute - Kumar vs MNC Corp",
-      date: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
-      time: "1:00 PM",
-      court: "Labour Court, Bangalore",
-      courtroom: "Court Room 2",
-      judge: "Hon'ble Justice M. Iyer",
-      type: "Hearing",
-      priority: "medium"
-    },
-    {
-      id: "7",
-      caseNumber: "CIV/2024/098",
-      caseTitle: "Tenant Dispute - Landlord vs Tenant",
-      date: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000),
-      time: "10:00 AM",
-      court: "Civil Court, Delhi",
-      courtroom: "Court Room 7",
-      judge: "Hon'ble Justice Rahul Sharma",
-      type: "Final Arguments",
-      priority: "high"
-    },
-    {
-      id: "8",
-      caseNumber: "FAM/2024/056",
-      caseTitle: "Maintenance Petition - Wife vs Husband",
-      date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-      time: "11:30 AM",
-      court: "Family Court, Mumbai",
-      courtroom: "Court Room 3",
-      judge: "Hon'ble Justice Kavita Singh",
-      type: "Hearing",
-      priority: "medium"
     }
   ];
 
@@ -136,10 +98,6 @@ export default function Alerts() {
   const isToday = (date: Date) => {
     const today = new Date();
     return date.toDateString() === today.toDateString();
-  };
-
-  const isSameMonth = (date: Date) => {
-    return date.getMonth() === currentDate.getMonth();
   };
 
   const previousMonth = () => {
@@ -216,185 +174,112 @@ export default function Alerts() {
     .slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" asChild>
-                <Link to="/dashboard/lawyer">
-                  <ArrowLeft className="h-5 w-5" />
-                </Link>
-              </Button>
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="h-6 w-6 text-primary" />
-                <div>
-                  <h1 className="text-xl font-bold">Court Calendar & Alerts</h1>
-                  <p className="text-sm text-muted-foreground">
-                    Manage your hearing schedule and reminders
-                  </p>
+    <AppLayout pageTitle="Court Calendar & Alerts">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
+        {/* Calendar Section */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Court Calendar</CardTitle>
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="icon" onClick={previousMonth}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="font-medium">
+                    {currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}
+                  </div>
+                  <Button variant="outline" size="icon" onClick={nextMonth}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-            </div>
-            <Button className="gap-2">
-              <Bell className="h-4 w-4" />
-              Set Reminder
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
-          {/* Calendar */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>
-                    {currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" onClick={previousMonth}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
-                      Today
-                    </Button>
-                    <Button variant="outline" size="icon" onClick={nextMonth}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
+            </CardHeader>
+            <CardContent>
+              {/* Calendar Header */}
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                  <div key={day} className="text-center text-sm font-medium text-muted-foreground">
+                    {day}
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-0">
-                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
-                    <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2 border-b border-border">
-                      {day}
-                    </div>
-                  ))}
-                  {renderCalendar()}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar - Upcoming Hearings */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Upcoming Hearings</CardTitle>
-                <CardDescription>Next 5 court dates</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {upcomingHearings.map(hearing => (
-                    <div key={hearing.id} className="p-3 border border-border rounded-lg hover:bg-accent/50 transition-colors">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <Badge className={getPriorityColor(hearing.priority)}>
-                          {hearing.priority}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {hearing.date.toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="font-medium text-sm mb-1">{hearing.caseNumber}</div>
-                      <div className="text-xs text-muted-foreground mb-2 line-clamp-1">
-                        {hearing.caseTitle}
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {hearing.time}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {hearing.courtroom}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Reminders */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="h-5 w-5" />
-                  Active Reminders
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <AlertCircle className="h-4 w-4 text-yellow-600 mt-0.5" />
-                      <div>
-                        <div className="text-sm font-medium">Hearing Tomorrow</div>
-                        <div className="text-xs text-muted-foreground">
-                          CIV/2024/001 at 10:30 AM
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <Bell className="h-4 w-4 text-blue-600 mt-0.5" />
-                      <div>
-                        <div className="text-sm font-medium">Document Submission Due</div>
-                        <div className="text-xs text-muted-foreground">
-                          Submit evidence by 5:00 PM today
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <CalendarIcon className="h-4 w-4 text-green-600 mt-0.5" />
-                      <div>
-                        <div className="text-sm font-medium">Mediation Scheduled</div>
-                        <div className="text-xs text-muted-foreground">
-                          FAM/2024/015 in 2 weeks
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                ))}
+              </div>
+              
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {renderCalendar()}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Selected Date Details */}
-        {selectedDate && (
-          <Card className="mt-8">
+        {/* Upcoming Hearings */}
+        <div className="lg:col-span-1">
+          <Card>
             <CardHeader>
-              <CardTitle>
-                Hearings on {selectedDate.toLocaleDateString("en-US", { 
-                  weekday: "long", 
-                  year: "numeric", 
-                  month: "long", 
-                  day: "numeric" 
-                })}
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-primary" />
+                Upcoming Hearings
               </CardTitle>
+              <CardDescription>
+                Your next 5 scheduled hearings
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {upcomingHearings.map((hearing) => (
+                <div
+                  key={hearing.id}
+                  className="flex items-center gap-4 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center bg-primary/10">
+                    <CalendarIcon className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-medium truncate">{hearing.caseTitle}</h4>
+                    <p className="text-xs text-muted-foreground">{hearing.caseNumber}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-xs">
+                        {hearing.date.toLocaleDateString()}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {hearing.time}
+                      </Badge>
+                      <Badge className={`text-xs ${getPriorityColor(hearing.priority)}`}>
+                        {hearing.priority}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Selected Day Hearings */}
+        {selectedDate && (
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-primary" />
+                  Hearings on {selectedDate.toLocaleDateString()}
+                </CardTitle>
+                <Button variant="outline" size="sm" onClick={() => setSelectedDate(null)}>
+                  Close
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {getHearingsForDate(selectedDate).length > 0 ? (
                 <div className="space-y-4">
-                  {getHearingsForDate(selectedDate).map(hearing => (
+                  {getHearingsForDate(selectedDate).map((hearing) => (
                     <Card key={hearing.id}>
-                      <CardContent className="pt-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <div className="font-semibold text-lg">{hearing.caseNumber}</div>
-                            <div className="text-sm text-muted-foreground">{hearing.caseTitle}</div>
-                          </div>
+                      <CardContent className="p-4">
+                        <h3 className="text-lg font-semibold mb-2">{hearing.caseTitle}</h3>
+                        <div className="flex items-center gap-2 mb-4">
+                          <Badge variant="outline">
+                            {hearing.caseNumber}
+                          </Badge>
                           <Badge className={getPriorityColor(hearing.priority)}>
                             {hearing.priority} priority
                           </Badge>
@@ -439,7 +324,9 @@ export default function Alerts() {
             </CardContent>
           </Card>
         )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }
+
+export default Alerts;
