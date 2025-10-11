@@ -311,13 +311,13 @@ export default function CitizenDashboard() {
                       <p className="text-sm text-muted-foreground py-8 text-center">{t.loading}</p>
                     ) : cases.length > 0 ? (
                       cases.map((case_) => (
-                        <Card key={case_.id} className="border-2 hover:border-primary/50 transition-colors">
+                        <Card key={case_._id} className="border-2 hover:border-primary/50 transition-colors">
                           <CardHeader>
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
                                 <CardTitle className="text-lg">{case_.title}</CardTitle>
                                 <CardDescription className="mt-1">
-                                  {language === "en" ? "Case" : "मामला"} #{case_.id} • {case_.court}
+                                  {language === "en" ? "Case" : "मामला"} #{case_._id} • {case_.court}
                                 </CardDescription>
                               </div>
                               {getStatusIcon(case_.status)}
@@ -371,12 +371,12 @@ export default function CitizenDashboard() {
                             {/* Actions */}
                             <div className="flex gap-2 pt-2">
                               <Button size="sm" variant="default" className="flex-1" asChild>
-                                <Link to={`/cases/${case_.id}`}>
+                                <Link to={`/cases/${case_._id}`}>
                                   {t.viewCase}
                                 </Link>
                               </Button>
                               <Button size="sm" variant="outline" className="flex-1" asChild>
-                                <Link to={`/aicounsel?caseId=${case_.id}`}>
+                                <Link to={`/aicounsel?caseId=${case_._id}`}>
                                   <MessageSquare className="h-4 w-4 mr-1" />
                                   {t.askAI}
                                 </Link>
@@ -472,7 +472,7 @@ export default function CitizenDashboard() {
       <FloatingChatbot
         userId={currentUser.username}
         userRole="user"
-        activeCaseIds={cases.map(c => c.id)}
+        activeCaseIds={cases.map(c => c._id)}
         initialOpen={isChatOpen}
       />
     </SidebarProvider>

@@ -10,6 +10,7 @@ import LawyerDashboard from "./pages/LawyerDashboard";
 import JudgeDashboard from "./pages/JudgeDashboard";
 import CitizenDashboard from "./pages/CitizenDashboard";
 import CaseFiles from "./pages/CaseFiles";
+import CaseDetail from "./pages/CaseDetail";
 import DocumentUpload from "./pages/DocumentUpload";
 import AICounsel from "./pages/AICounsel";
 import Analytics from "./pages/Analytics";
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/dashboard/judge" element={<JudgeDashboard />} />
               <Route path="/dashboard/citizen" element={<CitizenDashboard />} />
               <Route path="/cases" element={<CaseFiles />} />
+              <Route path="/cases/:id" element={<CaseDetail />} />
               <Route path="/upload" element={<DocumentUpload />} />
               <Route path="/aicounsel" element={<AICounsel />} />
               <Route path="/analytics" element={<Analytics />} />

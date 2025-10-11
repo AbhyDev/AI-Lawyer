@@ -9,68 +9,62 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000
 
 export interface Case {
   _id: string;
-  caseNumber: string;
-  title: string;
-  description: string;
-  category: string;
-  status: "Filed" | "Under Review" | "Hearing Scheduled" | "Judgment Pending" | "Closed" | "Active" | "Pending Review";
-  filingDate: string;
-  lastUpdated: string;
-  assignedJudge?: string;
-  assignedLawyer?: string;
-  citizens: string[];
-  public: {
-    caseNumber: string;
-    title: string;
-    category: string;
-    status: string;
-    filingDate: string;
-    court: string;
-    nextHearing?: string;
-    parties: {
-      petitioner: string;
-      respondent: string;
-    };
-    timeline: Array<{
-      date: string;
-      event: string;
-      description: string;
-    }>;
-  };
-  private: {
-    evidence: Array<{
-      _id: string;
-      title: string;
-      type: string;
-      uploadedBy: string;
-      uploadDate: string;
-      fileUrl: string;
-      accessLevel: "judge" | "lawyer" | "all";
-      metadata: {
-        fileSize: number;
-        mimeType: string;
-      };
-    }>;
-    internalNotes: Array<{
-      author: string;
-      role: string;
-      content: string;
-      timestamp: string;
-    }>;
-    aiAnalysis?: {
-      summary: string;
-      keyPoints: string[];
-      suggestedActions: string[];
-      similarCases: string[];
-      lastAnalyzed: string;
-    };
+  CaseID: string;
+  LawyerID: string;
+  JudgeID: string;
+  UserID: string;
+  
+  Evidence: {
+    photographs_and_videos: string[];
+    official_reports: string[];
+    contracts_and_agreements: string[];
+    financial_records: string[];
+    affidavits_and_statements: string[];
+    digital_communications: string[];
+    call_detail_records: string[];
+    forensic_reports: string[];
+    expert_opinions: string[];
+    physical_object_descriptions: string[];
   };
   
-  // Convenience properties for frontend (flattened access)
-  id: string;  // alias for _id
-  court: string;  // alias for public.court
-  nextHearing?: string;  // alias for public.nextHearing
-  parties?: { petitioner: string; respondent: string };  // alias for public.parties
+  Private: {
+    evidence_summary: string;
+    confidential_contacts: Array<{
+      name: string;
+      role: string;
+    }>;
+    privileged_communications: Record<string, any>;
+    legal_strategy_and_notes: string;
+  };
+  
+  Public: {
+    court_details: {
+      presiding_judge: string;
+      name: string;
+    };
+    parties: {
+      prosecution: string[];
+      defendant: string[];
+    };
+    case_type: string;
+    case_status: string;
+    case_summary: string;
+    timeline_of_proceedings: Array<{
+      date: string;
+      event: string;
+    }>;
+  };
+  
+  createdAt: string;
+  updatedAt: string;
+  
+  // Optional legacy/compatibility fields
+  title?: string;
+  description?: string;
+  status?: string;
+  court?: string;
+  category?: string;
+  filingDate?: string;
 }
 
 export interface Document {
@@ -163,8 +157,7 @@ export async function fetchCases(): Promise<Case[]> {
 export async function fetchAnalytics(): Promise<Analytics> {
   try {
     const token = localStorage.getItem("accessToken");
-    // TODO: Connect to your cloud backend endpoint
-    const response = await fetch(`${API_BASE_URL}/analytics`, {
+    const response = await fetch(`${API_BASE_URL}/api/cases/analytics`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -329,6 +322,34 @@ export async function sendAICounselMessage(
     console.error("Error sending AI counsel message:", error);
     // Return a fallback message
     return "I apologize, but I'm unable to process your request at the moment. Please try again later or contact support.";
+  }
+}
+
+/**
+ * Fetch a single case by its ID
+ */
+export async function fetchCaseById(caseId: string): Promise<Case> {
+  try {
+    if (!caseId) {
+      throw new Error("Case ID is undefined or empty");
+    }
+    
+    const token = localStorage.getItem("accessToken");
+    const response = await fetch(`${API_BASE_URL}/api/cases/${caseId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.case;
+  } catch (error) {
+    console.error("Error fetching case data:", error);
+    throw error;
   }
 }
 

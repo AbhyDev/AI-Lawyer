@@ -296,15 +296,15 @@ export default function JudgeDashboard() {
                         ) : filteredCases.length > 0 ? (
                           filteredCases.slice(0, 5).map((case_) => (
                             <div
-                              key={case_.id}
+                              key={case_._id}
                               className="flex items-start gap-3 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
-                              onClick={() => navigate(`/cases/${case_.id}`)}
+                              onClick={() => navigate(`/cases/${case_._id}`)}
                             >
                               <FolderOpen className="h-5 w-5 text-primary mt-0.5" />
                               <div className="flex-1">
                                 <div className="font-medium text-sm">{case_.title}</div>
                                 <div className="text-xs text-muted-foreground mt-1">
-                                  Case #{case_.id} • {case_.court}
+                                  Case #{case_._id} • {case_.court}
                                 </div>
                                 <div className="flex items-center gap-2 mt-2">
                                   <Badge variant="secondary">{case_.status}</Badge>
@@ -342,7 +342,7 @@ export default function JudgeDashboard() {
                         {pendingReviewCases.length > 0 ? (
                           pendingReviewCases.map((case_) => (
                             <div
-                              key={case_.id}
+                              key={case_._id}
                               className="flex items-start gap-3 p-4 rounded-lg border border-border bg-accent/5"
                             >
                               <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -351,17 +351,17 @@ export default function JudgeDashboard() {
                               <div className="flex-1">
                                 <div className="font-medium">{case_.title}</div>
                                 <div className="text-sm text-muted-foreground mt-1">
-                                  Case #{case_.id} • Filed: {new Date(case_.filingDate).toLocaleDateString()}
+                                  Case #{case_._id} • Filed: {new Date(case_.filingDate).toLocaleDateString()}
                                 </div>
                                 <div className="text-sm text-muted-foreground mt-1">
                                   {case_.parties.petitioner} vs {case_.parties.respondent}
                                 </div>
                                 <div className="flex items-center gap-2 mt-3">
-                                  <Button size="sm" className="gap-1" onClick={() => navigate(`/cases/${case_.id}`)}>
+                                  <Button size="sm" className="gap-1" onClick={() => navigate(`/cases/${case_._id}`)}>
                                     <Eye className="h-4 w-4" />
                                     Review Case
                                   </Button>
-                                  <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/aicounsel?caseId=${case_.id}`)}>
+                                  <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/aicounsel?caseId=${case_._id}`)}>
                                     <MessageSquare className="h-4 w-4" />
                                     AI Summary
                                   </Button>
@@ -497,7 +497,7 @@ export default function JudgeDashboard() {
       <FloatingChatbot
         userId={currentUser.username}
         userRole="judge"
-        activeCaseIds={cases.map(c => c.id)}
+        activeCaseIds={cases.map(c => c._id)}
       />
     </SidebarProvider>
   );

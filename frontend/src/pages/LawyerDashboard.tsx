@@ -53,6 +53,7 @@ export default function LawyerDashboard() {
         fetchCases(),
         fetchAnalytics()
       ]);
+      console.log("Fetched cases:", casesData);
       setCases(casesData);
       setAnalytics(analyticsData);
     } catch (error) {
@@ -266,15 +267,15 @@ export default function LawyerDashboard() {
                       ) : recentCases.length > 0 ? (
                         recentCases.map((case_) => (
                           <div
-                            key={case_.id}
+                            key={case_._id}
                             className="flex items-start gap-3 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
-                            onClick={() => navigate(`/cases/${case_.id}`)}
+                            onClick={() => navigate(`/cases/${case_._id}`)}
                           >
                             <FolderOpen className="h-5 w-5 text-primary mt-0.5" />
                             <div className="flex-1">
                               <div className="font-medium text-sm">{case_.title}</div>
                               <div className="text-xs text-muted-foreground mt-1">
-                                Case #{case_.id} • {case_.court}
+                                Case #{case_._id} • {case_.court}
                               </div>
                               <Badge variant="secondary" className="mt-2">
                                 {case_.status}
@@ -306,14 +307,14 @@ export default function LawyerDashboard() {
                       {upcomingHearings.length > 0 ? (
                         upcomingHearings.map((hearing) => (
                           <div
-                            key={hearing.id}
+                            key={hearing._id}
                             className="flex items-start gap-3 p-3 rounded-lg border border-border bg-accent/5"
                           >
                             <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
                               <AlertCircle className="h-5 w-5 text-accent" />
                             </div>
                             <div className="flex-1">
-                              <div className="font-medium text-sm">Case #{hearing.id}</div>
+                              <div className="font-medium text-sm">Case #{hearing._id}</div>
                               <div className="text-xs text-muted-foreground mt-1">
                                 {hearing.court}
                               </div>
@@ -378,7 +379,7 @@ export default function LawyerDashboard() {
       <FloatingChatbot
         userId={currentUser.username}
         userRole="lawyer"
-        activeCaseIds={cases.map(c => c.id)}
+        activeCaseIds={cases.map(c => c._id)}
       />
     </SidebarProvider>
   );
