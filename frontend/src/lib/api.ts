@@ -1,7 +1,9 @@
 // Frontend API Client - calls remote backend endpoints
 // This file contains NO backend logic, only fetch() calls to cloud API
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://unannotated-overthickly-ceola.ngrok-free.dev";
 
 // ============================================================================
 // TYPE DEFINITIONS (matching Mongoose schema exactly)
@@ -13,7 +15,7 @@ export interface Case {
   LawyerID: string;
   JudgeID: string;
   UserID: string;
-  
+
   Evidence: {
     photographs_and_videos: string[];
     official_reports: string[];
@@ -26,7 +28,7 @@ export interface Case {
     expert_opinions: string[];
     physical_object_descriptions: string[];
   };
-  
+
   Private: {
     evidence_summary: string;
     confidential_contacts: Array<{
@@ -36,7 +38,7 @@ export interface Case {
     privileged_communications: Record<string, any>;
     legal_strategy_and_notes: string;
   };
-  
+
   Public: {
     court_details: {
       presiding_judge: string;
@@ -54,10 +56,10 @@ export interface Case {
       event: string;
     }>;
   };
-  
+
   createdAt: string;
   updatedAt: string;
-  
+
   // Optional legacy/compatibility fields
   title?: string;
   description?: string;
@@ -80,13 +82,13 @@ export interface Document {
     fileSize: number;
     mimeType: string;
   };
-  
+
   // Convenience properties for frontend (flattened access)
-  id: string;  // alias for _id
-  name: string;  // alias for title
-  uploadedAt: string;  // alias for uploadDate
-  size: string;  // formatted fileSize from metadata
-  category?: string;  // optional classification category
+  id: string; // alias for _id
+  name: string; // alias for title
+  uploadedAt: string; // alias for uploadDate
+  size: string; // formatted fileSize from metadata
+  category?: string; // optional classification category
 }
 
 export interface Analytics {
@@ -129,9 +131,10 @@ export async function fetchCases(): Promise<Case[]> {
     const response = await fetch(`${API_BASE_URL}/api/cases`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true",
       },
     });
-    
+
     if (!response.ok) {
       if (response.status === 403) {
         // Not authorized, maybe token expired or not present
@@ -141,7 +144,7 @@ export async function fetchCases(): Promise<Case[]> {
       }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.cases || [];
   } catch (error) {
@@ -160,13 +163,14 @@ export async function fetchAnalytics(): Promise<Analytics> {
     const response = await fetch(`${API_BASE_URL}/api/cases/analytics`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true",
       },
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.analytics;
   } catch (error) {
@@ -195,12 +199,16 @@ export async function fetchAnalytics(): Promise<Analytics> {
 export async function fetchCaseDocuments(caseId: string): Promise<Document[]> {
   try {
     // TODO: Connect to your cloud backend endpoint
-    const response = await fetch(`${API_BASE_URL}/cases/${caseId}/documents`);
-    
+    const response = await fetch(`${API_BASE_URL}/cases/${caseId}/documents`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
+    });
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.documents || [];
   } catch (error) {
@@ -219,14 +227,15 @@ export async function createCase(caseData: Partial<Case>): Promise<Case> {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
       },
       body: JSON.stringify(caseData),
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.case;
   } catch (error) {
@@ -238,21 +247,25 @@ export async function createCase(caseData: Partial<Case>): Promise<Case> {
 /**
  * Update an existing case
  */
-export async function updateCase(caseId: string, updates: Partial<Case>): Promise<Case> {
+export async function updateCase(
+  caseId: string,
+  updates: Partial<Case>
+): Promise<Case> {
   try {
     // TODO: Connect to your cloud backend endpoint
     const response = await fetch(`${API_BASE_URL}/cases/${caseId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
       },
       body: JSON.stringify(updates),
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.case;
   } catch (error) {
@@ -264,22 +277,29 @@ export async function updateCase(caseId: string, updates: Partial<Case>): Promis
 /**
  * Upload a document to a case
  */
-export async function uploadDocument(caseId: string, file: File, metadata: any): Promise<Document> {
+export async function uploadDocument(
+  caseId: string,
+  file: File,
+  metadata: any
+): Promise<Document> {
   try {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("metadata", JSON.stringify(metadata));
-    
+
     // TODO: Connect to your cloud backend endpoint
     const response = await fetch(`${API_BASE_URL}/cases/${caseId}/documents`, {
       method: "POST",
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+      },
       body: formData,
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.document;
   } catch (error) {
@@ -305,17 +325,18 @@ export async function sendAICounselMessage(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
       },
       body: JSON.stringify({
         message,
         context,
       }),
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.response;
   } catch (error) {
@@ -333,18 +354,19 @@ export async function fetchCaseById(caseId: string): Promise<Case> {
     if (!caseId) {
       throw new Error("Case ID is undefined or empty");
     }
-    
+
     const token = localStorage.getItem("accessToken");
     const response = await fetch(`${API_BASE_URL}/api/cases/${caseId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true",
       },
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.case;
   } catch (error) {
@@ -352,7 +374,3 @@ export async function fetchCaseById(caseId: string): Promise<Case> {
     throw error;
   }
 }
-
-
-
-

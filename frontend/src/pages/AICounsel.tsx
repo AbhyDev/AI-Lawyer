@@ -71,12 +71,14 @@ function AICounsel() {
     try {
       const response = await fetch(
         `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"
+          import.meta.env.VITE_API_BASE_URL ||
+          "https://unannotated-overthickly-ceola.ngrok-free.dev"
         }/api/rag`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
           },
           body: JSON.stringify({ query: message }),
         }

@@ -33,7 +33,7 @@ const app = express();
 app.use(cookieParser());
 
 // Middleware
-app.use(cors({ origin: "http://localhost:8080", credentials: true }));
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 
 // Logger Middleware
