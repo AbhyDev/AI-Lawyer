@@ -1,5 +1,6 @@
 import { Case } from "../schemas/caseSchema.js";
 import { asyncHandler } from "./authController.js";
+import { loadCaseToRAG } from "./ragController.js";
 
 export const getCasesForUser = asyncHandler(async (req, res) => {
   const userId = req.user.username; // from verifyJWT middleware
@@ -50,6 +51,84 @@ export const getCaseById = asyncHandler(async (req, res) => {
   }
 
   res.status(200).json({ case: caseData });
+});
+
+export const createCase = asyncHandler(async (req, res) => {
+  try {
+    const caseData = req.body;
+    
+    // Save to MongoDB
+    const newCase = await Case.create(caseData);
+    
+    // Load the case into the RAG vector store
+    // This is non-blocking and won't affect response time
+    loadCaseToRAG(newCase._id.toString())
+      .then(success => {
+        if (success) {
+          console.log(`Case ${newCase._id} successfully loaded into RAG system`);
+        } else {
+          console.error(`Failed to load case ${newCase._id} into RAG system`);
+        }
+      })
+      .catch(error => {
+        console.error(`Error in RAG loading for case ${newCase._id}:`, error);
+      });
+    
+    return res.status(201).json({ 
+      success: true, 
+      message: "Case created successfully", 
+      caseId: newCase._id 
+    });
+  } catch (error) {
+    console.error("Error creating case:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Error creating case", 
+      error: error.message 
+    });
+  }
+});
+
+export const updateCase = asyncHandler(async (req, res) => {
+  try {
+    const caseId = req.params.id;
+    const caseData = req.body;
+    
+    const updatedCase = await Case.findByIdAndUpdate(
+      caseId, 
+      caseData, 
+      { new: true, runValidators: true }
+    );
+    
+    if (!updatedCase) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Case not found" 
+      });
+    }
+    
+    // Reload the case into RAG system since it was updated
+    loadCaseToRAG(caseId)
+      .then(success => {
+        console.log(`Case ${caseId} reloaded into RAG system: ${success ? 'success' : 'failed'}`);
+      })
+      .catch(error => {
+        console.error(`Error in RAG reloading for updated case ${caseId}:`, error);
+      });
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: "Case updated successfully", 
+      case: updatedCase 
+    });
+  } catch (error) {
+    console.error("Error updating case:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Error updating case", 
+      error: error.message 
+    });
+  }
 });
 
 export const getAnalytics = asyncHandler(async (req, res) => {

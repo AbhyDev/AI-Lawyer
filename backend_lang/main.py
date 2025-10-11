@@ -1,12 +1,22 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
+from pydantic import BaseModel
 import json
 from agent import classified_data
 from pathlib import Path
 from uuid import uuid4
 import hashlib
 import shutil
+
+# Import RAG functions
+from rag import (
+    fetch_case_from_mongodb,
+    extract_text_from_case,
+    create_vector_store,
+    query_rag_system,
+    global_retriever,
+)
 
 app = FastAPI()
 
@@ -165,3 +175,111 @@ async def classify_case_data(
     print("Cleanup complete.")
 
     return result
+
+
+# ========== RAG Endpoints ==========
+
+
+class RAGLoadRequest(BaseModel):
+    """Request model for /rag/load endpoint."""
+
+    caseID: str
+
+
+class RAGLoadResponse(BaseModel):
+    """Response model for /rag/load endpoint."""
+
+    success: bool
+    message: str
+    case_id: str
+    vector_store_path: str = None
+    documents_count: int = 0
+
+
+@app.post("/rag/load", response_model=RAGLoadResponse)
+async def load_case_to_vector_store(request: RAGLoadRequest):
+    """
+    Fetch a case document from MongoDB and create a vector store for it.
+
+    Args:
+        request: Contains the caseID to load
+
+    Returns:
+        Success status, message, and vector store path
+    """
+    try:
+        case_id = request.caseID
+
+        # Fetch case from MongoDB
+        print(f"Fetching case {case_id} from MongoDB...")
+        case_doc = await fetch_case_from_mongodb(case_id)
+
+        # Extract text and create documents
+        print(f"Extracting text from case {case_id}...")
+        documents = extract_text_from_case(case_doc)
+        print(f"Extracted {len(documents)} documents from case {case_id}")
+
+        # Create vector store
+        print(f"Creating vector store for case {case_id}...")
+        vector_store_path = create_vector_store(documents, case_id)
+        print(f"Vector store created at: {vector_store_path}")
+
+        return RAGLoadResponse(
+            success=True,
+            message=f"Successfully created vector store for case {case_id}",
+            case_id=case_id,
+            vector_store_path=vector_store_path,
+            documents_count=len(documents),
+        )
+
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        print(f"Error in /rag/load: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+class RAGQueryRequest(BaseModel):
+    """Request model for /rag/query endpoint."""
+
+    query: str
+
+
+class RAGQueryResponse(BaseModel):
+    """Response model for /rag/query endpoint."""
+
+    response: str
+
+
+@app.post("/rag/query", response_model=RAGQueryResponse)
+async def query_rag(request: RAGQueryRequest):
+    """
+    Query the RAG system with a question. The system will:
+    1. Load all vector stores
+    2. Use an LLM with tool calling to search the vector database
+    3. Return a comprehensive answer
+
+    Args:
+        request: Contains the query string
+
+    Returns:
+        AI assistant's response based on the vector database
+    """
+    try:
+        query = request.query
+
+        if not query or not query.strip():
+            raise HTTPException(status_code=400, detail="Query cannot be empty")
+
+        print(f"Processing RAG query: {query}")
+
+        # Query the RAG system
+        response = query_rag_system(query)
+
+        return RAGQueryResponse(response=response)
+
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        print(f"Error in /rag/query: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
