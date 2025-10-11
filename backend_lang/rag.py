@@ -14,6 +14,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
+from langchain_community.tools.tavily_search import TavilySearchResults
 
 # MongoDB imports
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -363,6 +364,53 @@ def search_vector_database(query: str, k: int = 5) -> str:
         return f"Error searching vector database: {str(e)}"
 
 
+@tool
+def search_web(query: str) -> str:
+    """
+    Search the web using Google to find information when the vector database has no relevant results.
+    This should be used as a fallback when no case documents contain the requested information.
+
+    Args:
+        query: The search query string
+
+    Returns:
+        A formatted string containing web search results
+    """
+    try:
+        # Initialize Tavily search
+        tavily_api_key = os.getenv("TAVILY_API_KEY")
+        if not tavily_api_key:
+            return "Error: TAVILY_API_KEY not set. Cannot perform web search."
+
+        search = TavilySearchResults(
+            max_results=3,
+            search_depth="advanced",
+            include_answer=True,
+            include_raw_content=False,
+        )
+
+        # Perform search
+        results = search.invoke({"query": query})
+
+        if not results:
+            return "No web results found for the query."
+
+        # Format results
+        formatted_results = ["Web Search Results:\n"]
+        for idx, result in enumerate(results, 1):
+            formatted_results.append(
+                f"--- Result {idx} ---\n"
+                f"Title: {result.get('title', 'N/A')}\n"
+                f"URL: {result.get('url', 'N/A')}\n"
+                f"Content: {result.get('content', 'N/A')}\n"
+            )
+
+        return "\n".join(formatted_results)
+
+    except Exception as e:
+        return f"Error performing web search: {str(e)}"
+
+
 class RAGAgentState(TypedDict):
     """State for the RAG agent."""
 
@@ -371,7 +419,7 @@ class RAGAgentState(TypedDict):
 
 
 # Tools for the agent
-rag_tools = [search_vector_database]
+rag_tools = [search_vector_database, search_web]
 llm_with_tools = llm.bind_tools(tools=rag_tools)
 
 
@@ -383,20 +431,23 @@ def rag_agent_node(state: RAGAgentState) -> RAGAgentState:
 
     system_prompt = SystemMessage(
         content="""
-You are an expert legal AI assistant with access to a comprehensive vector database of legal case documents.
+You are an expert legal AI assistant with access to a comprehensive vector database of legal case documents and web search capabilities.
 
 Your role is to:
 1. Understand the user's query about legal cases
-2. Use the `search_vector_database` tool to find relevant information from the case documents
-3. Analyze the retrieved information carefully
-4. Provide a clear, comprehensive, and well-structured answer
+2. First, ALWAYS use the `search_vector_database` tool to find relevant information from the case documents
+3. If the vector database returns "No relevant documents found", then use the `search_web` tool to search Google for the information
+4. Analyze the retrieved information carefully
+5. Provide a clear, comprehensive, and well-structured answer
 
-When searching the database:
-- Use the tool with appropriate search queries
-- You may call the tool multiple times with different queries if needed
-- Always cite the case IDs and sections when referencing specific information
+Search Strategy:
+- ALWAYS start with `search_vector_database` to check case documents first
+- If no relevant documents are found (the tool returns "No relevant documents found"), immediately use `search_web` to find information from the internet
+- You may call the search_vector_database tool multiple times with different queries if needed
+- When using information from case documents, always cite the case IDs and sections
+- When using information from web search, mention that it's from external sources
 
-Provide your final answer in a professional legal assistant tone, ensuring accuracy and clarity.
+Provide your final answer in a professional legal assistant tone, ensuring accuracy and clarity. If you had to use web search because no case documents were relevant, mention this clearly in your response.
     """
     )
 
