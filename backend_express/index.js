@@ -22,7 +22,7 @@ if (missingEnvVars.length > 0) {
   process.exit(1);
 }
 import { connectToMongoDB } from "./utils/mongoUtils.js";
-// import { connectToRedis } from "./utils/redisUtils.js";
+import { connectToRedis } from "./utils/redisUtils.js";
 import authRouter from "./routes/authRouter.js";
 import telegramRouter from "./routes/telegramRouter.js";
 import caseRouter from "./routes/caseRouter.js";
@@ -81,7 +81,7 @@ async function startServer() {
 
   // Connect to databases
   await connectToMongoDB();
-  // await connectToRedis();
+  await connectToRedis();
 
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
