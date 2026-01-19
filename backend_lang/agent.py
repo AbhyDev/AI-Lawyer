@@ -15,6 +15,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import mimetypes
 from analyse import analyse
 import fitz  # PyMuPDF
+from legal_classifier import classify_legal_text  # ML model for case type classification
 
 load_dotenv()
 llm = ChatGoogleGenerativeAI(
@@ -260,11 +261,19 @@ def classified_data(incoming_data: str)->str:
     global privateinfo
     #dig_evidence and dig_rest are doc type byt digital, while string_dig_evidence, string_dig_rest are combined + in single string
     dig_evidence, dig_rest, string_dig_evidence, string_dig_rest = preprocess_data(Database['evidence'], Database['Full_docs'])
+    
+    # Run ML classifier FIRST (showcase for academic purposes)
+    combined_text = string_dig_evidence + " " + string_dig_rest
+    ml_result = classify_legal_text(combined_text)
+    print(f"[ML Classifier] Prediction: {ml_result['type']} (confidence: {ml_result['confidence']*100:.1f}%)")
+    
+    # Then run LangGraph agent for full extraction
     app.invoke({"messages":[HumanMessage(content="Start the Analysis")],
         "evidence" : string_dig_evidence, 
         "Full_docs" : string_dig_rest
     })
     # use the storage variables that are plain Python structures (not tool objects)
+    
     finalised = {
         "CaseID" : Database["CaseID"],
         "LawyerID": Database["LawyerID"],
