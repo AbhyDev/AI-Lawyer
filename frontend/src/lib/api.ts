@@ -12,6 +12,7 @@ export const API_BASE_URL =
 export interface Case {
   _id: string;
   CaseID: string;
+  CaseName?: string; // LLM-generated case title (e.g., "Sharma vs Singh - Loan Recovery")
   LawyerID: string;
   JudgeID: string;
   UserID: string;
@@ -249,7 +250,7 @@ export async function createCase(caseData: Partial<Case>): Promise<Case> {
  */
 export async function updateCase(
   caseId: string,
-  updates: Partial<Case>
+  updates: Partial<Case>,
 ): Promise<Case> {
   try {
     // TODO: Connect to your cloud backend endpoint
@@ -280,7 +281,7 @@ export async function updateCase(
 export async function uploadDocument(
   caseId: string,
   file: File,
-  metadata: any
+  metadata: any,
 ): Promise<Document> {
   try {
     const formData = new FormData();
@@ -317,7 +318,7 @@ export async function sendAICounselMessage(
     userId: string;
     userRole: string;
     caseIds?: string[];
-  }
+  },
 ): Promise<string> {
   try {
     // TODO: Connect to LangGraph endpoint with RAG + Gemini Flash + BART integration

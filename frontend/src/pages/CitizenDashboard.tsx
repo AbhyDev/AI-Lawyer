@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -22,10 +28,20 @@ import {
   Clock,
   AlertCircle,
   Globe,
-  LogOut
+  LogOut,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
 import { FloatingChatbot } from "@/components/FloatingChatbot";
 import { fetchCases, fetchAnalytics, type Case } from "@/lib/api";
 
@@ -49,7 +65,7 @@ export default function CitizenDashboard() {
     try {
       const [casesData, analyticsData] = await Promise.all([
         fetchCases(),
-        fetchAnalytics()
+        fetchAnalytics(),
       ]);
       setCases(casesData);
       setAnalytics(analyticsData);
@@ -78,7 +94,7 @@ export default function CitizenDashboard() {
       loading: "Loading your cases...",
       filed: "Filed",
       inProgress: "In Progress",
-      completed: "Completed"
+      completed: "Completed",
     },
     hi: {
       welcome: "स्वागत है",
@@ -97,37 +113,54 @@ export default function CitizenDashboard() {
       loading: "आपके मामले लोड हो रहे हैं...",
       filed: "दायर किया गया",
       inProgress: "प्रगति में",
-      completed: "पूर्ण"
-    }
+      completed: "पूर्ण",
+    },
   };
 
   const t = content[language];
 
   const menuItems = [
-    { title: language === "en" ? "Home" : "होम", icon: Home, url: "/dashboard/citizen" },
-    { title: language === "en" ? "My Cases" : "मेरे मामले", icon: FileText, url: "/cases" },
-    { title: language === "en" ? "AI Assistant" : "AI सहायक", icon: MessageSquare, url: "/aicounsel" },
-    { title: language === "en" ? "Settings" : "सेटिंग्स", icon: Settings, url: "/settings" },
+    {
+      title: language === "en" ? "Home" : "होम",
+      icon: Home,
+      url: "/dashboard/citizen",
+    },
+    {
+      title: language === "en" ? "My Cases" : "मेरे मामले",
+      icon: FileText,
+      url: "/cases",
+    },
+    {
+      title: language === "en" ? "AI Assistant" : "AI सहायक",
+      icon: MessageSquare,
+      url: "/aicounsel",
+    },
+    {
+      title: language === "en" ? "Settings" : "सेटिंग्स",
+      icon: Settings,
+      url: "/settings",
+    },
   ];
 
   const getProgressPercentage = (status: string): number => {
     const statusMap: Record<string, number> = {
-      "Filed": 25,
-      "Active": 50,
+      Filed: 25,
+      Active: 50,
       "Pending Review": 75,
-      "Closed": 100
+      Closed: 100,
     };
     return statusMap[status] || 50;
   };
 
   const getStatusIcon = (status: string) => {
-    if (status === "Closed") return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+    if (status === "Closed")
+      return <CheckCircle2 className="h-5 w-5 text-green-500" />;
     if (status === "Active") return <Clock className="h-5 w-5 text-blue-500" />;
     return <AlertCircle className="h-5 w-5 text-orange-500" />;
   };
 
   const navigate = useNavigate();
-  
+
   // Import the shared logout handler
   const handleLogout = () => {
     import("@/lib/auth").then(({ handleLogout }) => {
@@ -248,7 +281,9 @@ export default function CitizenDashboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold">{analytics?.myCases || cases.length}</div>
+                    <div className="text-3xl font-bold">
+                      {analytics?.myCases || cases.length}
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       {language === "en" ? "Total cases" : "कुल मामले"}
                     </p>
@@ -280,7 +315,9 @@ export default function CitizenDashboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold">{analytics?.pendingActions || 0}</div>
+                    <div className="text-3xl font-bold">
+                      {analytics?.pendingActions || 0}
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       {language === "en" ? "Action items" : "कार्रवाई आइटम"}
                     </p>
@@ -293,25 +330,40 @@ export default function CitizenDashboard() {
                 <CardHeader>
                   <CardTitle className="text-xl">{t.myCases}</CardTitle>
                   <CardDescription>
-                    {language === "en" 
+                    {language === "en"
                       ? "Track the progress of your legal cases"
-                      : "अपने कानूनी मामलों की प्रगति ट्रैक करें"
-                    }
+                      : "अपने कानूनी मामलों की प्रगति ट्रैक करें"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {loading ? (
-                      <p className="text-sm text-muted-foreground py-8 text-center">{t.loading}</p>
+                      <p className="text-sm text-muted-foreground py-8 text-center">
+                        {t.loading}
+                      </p>
                     ) : cases.length > 0 ? (
                       cases.map((case_) => (
-                        <Card key={case_._id} className="border-2 hover:border-primary/50 transition-colors">
+                        <Card
+                          key={case_._id}
+                          className="border-2 hover:border-primary/50 transition-colors"
+                        >
                           <CardHeader>
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <CardTitle className="text-lg">{case_.title}</CardTitle>
+                                <CardTitle className="text-lg">
+                                  {case_.CaseName ||
+                                    case_.title ||
+                                    case_.Public?.case_summary?.substring(
+                                      0,
+                                      50,
+                                    ) ||
+                                    `Case #${case_.CaseID?.substring(0, 8)}`}
+                                </CardTitle>
                                 <CardDescription className="mt-1">
-                                  {language === "en" ? "Case" : "मामला"} #{case_._id} • {case_.court}
+                                  {language === "en" ? "ID" : "आईडी"}:{" "}
+                                  {case_.CaseID || case_._id} •{" "}
+                                  {case_.court ||
+                                    case_.Public?.court_details?.name}
                                 </CardDescription>
                               </div>
                               {getStatusIcon(case_.status)}
@@ -321,20 +373,33 @@ export default function CitizenDashboard() {
                             {/* Progress Bar */}
                             <div className="space-y-2">
                               <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">{t.caseProgress}</span>
-                                <span className="font-medium">{getProgressPercentage(case_.status)}%</span>
+                                <span className="text-muted-foreground">
+                                  {t.caseProgress}
+                                </span>
+                                <span className="font-medium">
+                                  {getProgressPercentage(case_.status)}%
+                                </span>
                               </div>
-                              <Progress value={getProgressPercentage(case_.status)} className="h-2" />
+                              <Progress
+                                value={getProgressPercentage(case_.status)}
+                                className="h-2"
+                              />
                             </div>
 
                             {/* Case Details */}
                             <div className="grid md:grid-cols-2 gap-4 text-sm">
                               <div>
                                 <span className="text-muted-foreground">
-                                  {language === "en" ? "Filed on:" : "दायर किया गया:"}
+                                  {language === "en"
+                                    ? "Filed on:"
+                                    : "दायर किया गया:"}
                                 </span>
                                 <p className="font-medium">
-                                  {new Date(case_.filingDate).toLocaleDateString(language === "hi" ? "hi-IN" : "en-IN")}
+                                  {new Date(
+                                    case_.filingDate,
+                                  ).toLocaleDateString(
+                                    language === "hi" ? "hi-IN" : "en-IN",
+                                  )}
                                 </p>
                               </div>
                               <div>
@@ -342,7 +407,9 @@ export default function CitizenDashboard() {
                                   {language === "en" ? "Status:" : "स्थिति:"}
                                 </span>
                                 <div className="mt-1">
-                                  <Badge variant="secondary">{case_.status}</Badge>
+                                  <Badge variant="secondary">
+                                    {case_.status}
+                                  </Badge>
                                 </div>
                               </div>
                             </div>
@@ -353,10 +420,14 @@ export default function CitizenDashboard() {
                                 <Calendar className="h-5 w-5 text-accent mt-0.5" />
                                 <div className="flex-1">
                                   <div className="text-sm font-medium">
-                                    {language === "en" ? "Next Hearing" : "अगली सुनवाई"}
+                                    {language === "en"
+                                      ? "Next Hearing"
+                                      : "अगली सुनवाई"}
                                   </div>
                                   <div className="text-sm text-muted-foreground">
-                                    {new Date(case_.nextHearing).toLocaleString(language === "hi" ? "hi-IN" : "en-IN")}
+                                    {new Date(case_.nextHearing).toLocaleString(
+                                      language === "hi" ? "hi-IN" : "en-IN",
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -364,12 +435,22 @@ export default function CitizenDashboard() {
 
                             {/* Actions */}
                             <div className="flex gap-2 pt-2">
-                              <Button size="sm" variant="default" className="flex-1" asChild>
+                              <Button
+                                size="sm"
+                                variant="default"
+                                className="flex-1"
+                                asChild
+                              >
                                 <Link to={`/cases/${case_._id}`}>
                                   {t.viewCase}
                                 </Link>
                               </Button>
-                              <Button size="sm" variant="outline" className="flex-1" asChild>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex-1"
+                                asChild
+                              >
                                 <Link to={`/aicounsel?caseId=${case_._id}`}>
                                   <MessageSquare className="h-4 w-4 mr-1" />
                                   {t.askAI}
@@ -394,40 +475,47 @@ export default function CitizenDashboard() {
                 <CardHeader>
                   <CardTitle>{t.quickActions}</CardTitle>
                   <CardDescription>
-                    {language === "en" 
+                    {language === "en"
                       ? "Common actions and help"
-                      : "सामान्य कार्य और सहायता"
-                    }
+                      : "सामान्य कार्य और सहायता"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-3">
-                    <Button variant="outline" className="h-auto py-4 justify-start gap-3" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 justify-start gap-3"
+                      asChild
+                    >
                       <Link to="/aicounsel">
                         <MessageSquare className="h-6 w-6" />
                         <div className="text-left">
                           <div className="font-medium">{t.talkToAI}</div>
                           <div className="text-xs text-muted-foreground">
-                            {language === "en" 
+                            {language === "en"
                               ? "Get instant legal guidance"
-                              : "तुरंत कानूनी मार्गदर्शन प्राप्त करें"
-                            }
+                              : "तुरंत कानूनी मार्गदर्शन प्राप्त करें"}
                           </div>
                         </div>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 justify-start gap-3" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 justify-start gap-3"
+                      asChild
+                    >
                       <Link to="/cases">
                         <FileText className="h-6 w-6" />
                         <div className="text-left">
                           <div className="font-medium">
-                            {language === "en" ? "View All Cases" : "सभी मामले देखें"}
+                            {language === "en"
+                              ? "View All Cases"
+                              : "सभी मामले देखें"}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {language === "en" 
+                            {language === "en"
                               ? "Complete case history"
-                              : "पूर्ण मामले का इतिहास"
-                            }
+                              : "पूर्ण मामले का इतिहास"}
                           </div>
                         </div>
                       </Link>
@@ -448,8 +536,7 @@ export default function CitizenDashboard() {
                   <p className="text-sm text-muted-foreground mb-4">
                     {language === "en"
                       ? "Our AI assistant is available 24/7 to answer your questions in simple language. Click the chat button to get started."
-                      : "हमारा AI सहायक 24/7 आपके सवालों का जवाब सरल भाषा में देने के लिए उपलब्ध है। शुरू करने के लिए चैट बटन पर क्लिक करें।"
-                    }
+                      : "हमारा AI सहायक 24/7 आपके सवालों का जवाब सरल भाषा में देने के लिए उपलब्ध है। शुरू करने के लिए चैट बटन पर क्लिक करें।"}
                   </p>
                   <Button className="gap-2" onClick={() => setChatOpen(true)}>
                     <MessageSquare className="h-4 w-4" />
@@ -466,7 +553,7 @@ export default function CitizenDashboard() {
       <FloatingChatbot
         userId={currentUser.username}
         userRole="user"
-        activeCaseIds={cases.map(c => c._id)}
+        activeCaseIds={cases.map((c) => c._id)}
         initialOpen={isChatOpen}
       />
     </SidebarProvider>

@@ -29,6 +29,7 @@ dependencies = [
     "motor>=3.7.1",
     "pymongo>=4.15.3",
     "fastapi[standard]>=0.128.0",
+    "langchain-groq>=1.1.1",
 ]
 
 [[tool.uv.index]]

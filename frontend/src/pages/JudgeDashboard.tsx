@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,10 +31,20 @@ import {
   Calendar,
   FolderOpen,
   TrendingUp,
-  LogOut
+  LogOut,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
 import { FloatingChatbot } from "@/components/FloatingChatbot";
 import { fetchCases, fetchAnalytics, type Case } from "@/lib/api";
 
@@ -54,7 +70,7 @@ export default function JudgeDashboard() {
       // Judges can see all cases
       const [casesData, analyticsData] = await Promise.all([
         fetchCases(),
-        fetchAnalytics()
+        fetchAnalytics(),
       ]);
       setCases(casesData);
       setAnalytics(analyticsData);
@@ -73,11 +89,14 @@ export default function JudgeDashboard() {
     { title: "Settings", icon: Settings, url: "/settings" },
   ];
 
-  const filteredCases = filterStatus === "all" 
-    ? cases 
-    : cases.filter(c => c.status.toLowerCase().includes(filterStatus.toLowerCase()));
+  const filteredCases =
+    filterStatus === "all"
+      ? cases
+      : cases.filter((c) =>
+          c.status.toLowerCase().includes(filterStatus.toLowerCase()),
+        );
 
-  const pendingReviewCases = cases.filter(c => c.status === "Pending Review");
+  const pendingReviewCases = cases.filter((c) => c.status === "Pending Review");
 
   const handleLogout = () => {
     import("@/lib/auth").then(({ handleLogout }) => {
@@ -94,8 +113,12 @@ export default function JudgeDashboard() {
             <div className="flex items-center gap-2">
               <Scale className="h-6 w-6 text-sidebar-primary" />
               <div>
-                <h1 className="text-lg font-bold text-sidebar-foreground">UDAAN</h1>
-                <p className="text-xs text-sidebar-foreground/70">Judge Portal</p>
+                <h1 className="text-lg font-bold text-sidebar-foreground">
+                  UDAAN
+                </h1>
+                <p className="text-xs text-sidebar-foreground/70">
+                  Judge Portal
+                </p>
               </div>
             </div>
           </div>
@@ -142,7 +165,8 @@ export default function JudgeDashboard() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="gap-2">
                       <Filter className="h-4 w-4" />
-                      Filter: {filterStatus === "all" ? "All Cases" : filterStatus}
+                      Filter:{" "}
+                      {filterStatus === "all" ? "All Cases" : filterStatus}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -151,13 +175,19 @@ export default function JudgeDashboard() {
                     <DropdownMenuItem onClick={() => setFilterStatus("all")}>
                       All Cases
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus("Pending Review")}>
+                    <DropdownMenuItem
+                      onClick={() => setFilterStatus("Pending Review")}
+                    >
                       Pending Review
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus("Under Review")}>
+                    <DropdownMenuItem
+                      onClick={() => setFilterStatus("Under Review")}
+                    >
                       Under Review
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFilterStatus("Hearing Scheduled")}>
+                    <DropdownMenuItem
+                      onClick={() => setFilterStatus("Hearing Scheduled")}
+                    >
                       Hearing Scheduled
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setFilterStatus("Closed")}>
@@ -175,7 +205,9 @@ export default function JudgeDashboard() {
                       </div>
                       <div className="text-sm text-left">
                         <div className="font-medium">{userName}</div>
-                        <div className="text-xs text-muted-foreground">Judge</div>
+                        <div className="text-xs text-muted-foreground">
+                          Judge
+                        </div>
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
@@ -204,9 +236,13 @@ export default function JudgeDashboard() {
             <div className="max-w-7xl mx-auto space-y-6">
               {/* Welcome Banner */}
               <div className="bg-gradient-hero text-primary-foreground rounded-lg p-6">
-                <h2 className="text-2xl font-bold mb-2">Good day, Your Honor</h2>
+                <h2 className="text-2xl font-bold mb-2">
+                  Good day, Your Honor
+                </h2>
                 <p className="text-primary-foreground/90">
-                  You have {analytics?.pendingReviews || 0} cases pending review. {analytics?.completedThisMonth || 0} cases completed this month.
+                  You have {analytics?.pendingReviews || 0} cases pending
+                  review. {analytics?.completedThisMonth || 0} cases completed
+                  this month.
                 </p>
               </div>
 
@@ -230,8 +266,12 @@ export default function JudgeDashboard() {
                         <Eye className="h-4 w-4 text-muted-foreground" />
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">{analytics?.totalCasesReviewed || 0}</div>
-                        <p className="text-xs text-muted-foreground mt-1">All time</p>
+                        <div className="text-2xl font-bold">
+                          {analytics?.totalCasesReviewed || 0}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          All time
+                        </p>
                       </CardContent>
                     </Card>
 
@@ -243,8 +283,12 @@ export default function JudgeDashboard() {
                         <FileText className="h-4 w-4 text-muted-foreground" />
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">{analytics?.pendingReviews || 0}</div>
-                        <p className="text-xs text-muted-foreground mt-1">Awaiting judgment</p>
+                        <div className="text-2xl font-bold">
+                          {analytics?.pendingReviews || 0}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Awaiting judgment
+                        </p>
                       </CardContent>
                     </Card>
 
@@ -256,8 +300,12 @@ export default function JudgeDashboard() {
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">{analytics?.completedThisMonth || 0}</div>
-                        <p className="text-xs text-muted-foreground mt-1">Cases resolved</p>
+                        <div className="text-2xl font-bold">
+                          {analytics?.completedThisMonth || 0}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Cases resolved
+                        </p>
                       </CardContent>
                     </Card>
 
@@ -269,8 +317,12 @@ export default function JudgeDashboard() {
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">{analytics?.avgReviewTime || "N/A"}</div>
-                        <p className="text-xs text-muted-foreground mt-1">Per case</p>
+                        <div className="text-2xl font-bold">
+                          {analytics?.avgReviewTime || "N/A"}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Per case
+                        </p>
                       </CardContent>
                     </Card>
                   </div>
@@ -279,12 +331,16 @@ export default function JudgeDashboard() {
                   <Card>
                     <CardHeader>
                       <CardTitle>All Cases</CardTitle>
-                      <CardDescription>Complete case docket - read-only access</CardDescription>
+                      <CardDescription>
+                        Complete case docket - read-only access
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         {loading ? (
-                          <p className="text-sm text-muted-foreground">Loading cases...</p>
+                          <p className="text-sm text-muted-foreground">
+                            Loading cases...
+                          </p>
                         ) : filteredCases.length > 0 ? (
                           filteredCases.slice(0, 5).map((case_) => (
                             <div
@@ -294,23 +350,43 @@ export default function JudgeDashboard() {
                             >
                               <FolderOpen className="h-5 w-5 text-primary mt-0.5" />
                               <div className="flex-1">
-                                <div className="font-medium text-sm">{case_.title}</div>
+                                <div className="font-medium text-sm">
+                                  {case_.CaseName ||
+                                    case_.title ||
+                                    case_.Public?.case_summary?.substring(
+                                      0,
+                                      50,
+                                    ) ||
+                                    `Case #${case_.CaseID?.substring(0, 8)}`}
+                                </div>
                                 <div className="text-xs text-muted-foreground mt-1">
-                                  Case #{case_._id} • {case_.court}
+                                  ID: {case_.CaseID || case_._id} •{" "}
+                                  {case_.court ||
+                                    case_.Public?.court_details?.name}
                                 </div>
                                 <div className="flex items-center gap-2 mt-2">
-                                  <Badge variant="secondary">{case_.status}</Badge>
-                                  <Badge variant="outline">{case_.category}</Badge>
+                                  <Badge variant="secondary">
+                                    {case_.status}
+                                  </Badge>
+                                  <Badge variant="outline">
+                                    {case_.category}
+                                  </Badge>
                                 </div>
                               </div>
-                              <Button variant="ghost" size="sm" className="gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="gap-1"
+                              >
                                 <Eye className="h-4 w-4" />
                                 Review
                               </Button>
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-muted-foreground">No cases found</p>
+                          <p className="text-sm text-muted-foreground">
+                            No cases found
+                          </p>
                         )}
                         <Button variant="outline" className="w-full" asChild>
                           <Link to="/cases">View All Cases</Link>
@@ -341,19 +417,44 @@ export default function JudgeDashboard() {
                                 <FileText className="h-5 w-5 text-accent" />
                               </div>
                               <div className="flex-1">
-                                <div className="font-medium">{case_.title}</div>
-                                <div className="text-sm text-muted-foreground mt-1">
-                                  Case #{case_._id} • Filed: {new Date(case_.filingDate).toLocaleDateString()}
+                                <div className="font-medium">
+                                  {case_.CaseName ||
+                                    case_.title ||
+                                    case_.Public?.case_summary?.substring(
+                                      0,
+                                      50,
+                                    ) ||
+                                    `Case #${case_.CaseID?.substring(0, 8)}`}
                                 </div>
                                 <div className="text-sm text-muted-foreground mt-1">
-                                  {case_.parties.petitioner} vs {case_.parties.respondent}
+                                  ID: {case_.CaseID || case_._id} • Filed:{" "}
+                                  {new Date(
+                                    case_.filingDate || case_.createdAt,
+                                  ).toLocaleDateString()}
+                                </div>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  {case_.parties.petitioner} vs{" "}
+                                  {case_.parties.respondent}
                                 </div>
                                 <div className="flex items-center gap-2 mt-3">
-                                  <Button size="sm" className="gap-1" onClick={() => navigate(`/cases/${case_._id}`)}>
+                                  <Button
+                                    size="sm"
+                                    className="gap-1"
+                                    onClick={() =>
+                                      navigate(`/cases/${case_._id}`)
+                                    }
+                                  >
                                     <Eye className="h-4 w-4" />
                                     Review Case
                                   </Button>
-                                  <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate(`/aicounsel?caseId=${case_._id}`)}>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="gap-1"
+                                    onClick={() =>
+                                      navigate(`/aicounsel?caseId=${case_._id}`)
+                                    }
+                                  >
                                     <MessageSquare className="h-4 w-4" />
                                     AI Summary
                                   </Button>
@@ -362,7 +463,9 @@ export default function JudgeDashboard() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-muted-foreground py-4">No cases pending review</p>
+                          <p className="text-sm text-muted-foreground py-4">
+                            No cases pending review
+                          </p>
                         )}
                       </div>
                     </CardContent>
@@ -378,18 +481,33 @@ export default function JudgeDashboard() {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
-                          {["Civil", "Property", "Employment", "Criminal", "Family"].map((category) => {
-                            const count = cases.filter(c => c.category === category).length;
-                            const percentage = cases.length > 0 ? (count / cases.length) * 100 : 0;
+                          {[
+                            "Civil",
+                            "Property",
+                            "Employment",
+                            "Criminal",
+                            "Family",
+                          ].map((category) => {
+                            const count = cases.filter(
+                              (c) => c.category === category,
+                            ).length;
+                            const percentage =
+                              cases.length > 0
+                                ? (count / cases.length) * 100
+                                : 0;
                             return (
                               <div key={category} className="space-y-1">
                                 <div className="flex justify-between text-sm">
-                                  <span className="text-muted-foreground">{category}</span>
-                                  <span className="font-medium">{count} cases ({percentage.toFixed(0)}%)</span>
+                                  <span className="text-muted-foreground">
+                                    {category}
+                                  </span>
+                                  <span className="font-medium">
+                                    {count} cases ({percentage.toFixed(0)}%)
+                                  </span>
                                 </div>
                                 <div className="h-2 bg-muted rounded-full overflow-hidden">
-                                  <div 
-                                    className="h-full bg-primary transition-all" 
+                                  <div
+                                    className="h-full bg-primary transition-all"
                                     style={{ width: `${percentage}%` }}
                                   />
                                 </div>
@@ -406,11 +524,23 @@ export default function JudgeDashboard() {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
-                          {["Active", "Pending Review", "Closed", "Adjourned"].map((status) => {
-                            const count = cases.filter(c => c.status === status).length;
+                          {[
+                            "Active",
+                            "Pending Review",
+                            "Closed",
+                            "Adjourned",
+                          ].map((status) => {
+                            const count = cases.filter(
+                              (c) => c.status === status,
+                            ).length;
                             return (
-                              <div key={status} className="flex justify-between items-center p-3 rounded-lg border">
-                                <span className="text-sm font-medium">{status}</span>
+                              <div
+                                key={status}
+                                className="flex justify-between items-center p-3 rounded-lg border"
+                              >
+                                <span className="text-sm font-medium">
+                                  {status}
+                                </span>
                                 <Badge variant="secondary">{count}</Badge>
                               </div>
                             );
@@ -423,21 +553,35 @@ export default function JudgeDashboard() {
                   <Card>
                     <CardHeader>
                       <CardTitle>Performance Metrics</CardTitle>
-                      <CardDescription>Your judicial performance overview</CardDescription>
+                      <CardDescription>
+                        Your judicial performance overview
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="grid md:grid-cols-3 gap-4">
                         <div className="p-4 rounded-lg bg-accent/5 border border-accent/20">
-                          <div className="text-sm text-muted-foreground mb-1">Cases This Month</div>
-                          <div className="text-2xl font-bold">{analytics?.completedThisMonth || 0}</div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            Cases This Month
+                          </div>
+                          <div className="text-2xl font-bold">
+                            {analytics?.completedThisMonth || 0}
+                          </div>
                         </div>
                         <div className="p-4 rounded-lg bg-accent/5 border border-accent/20">
-                          <div className="text-sm text-muted-foreground mb-1">Average Review Time</div>
-                          <div className="text-2xl font-bold">{analytics?.avgReviewTime || "N/A"}</div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            Average Review Time
+                          </div>
+                          <div className="text-2xl font-bold">
+                            {analytics?.avgReviewTime || "N/A"}
+                          </div>
                         </div>
                         <div className="p-4 rounded-lg bg-accent/5 border border-accent/20">
-                          <div className="text-sm text-muted-foreground mb-1">Pending Backlog</div>
-                          <div className="text-2xl font-bold">{analytics?.pendingReviews || 0}</div>
+                          <div className="text-sm text-muted-foreground mb-1">
+                            Pending Backlog
+                          </div>
+                          <div className="text-2xl font-bold">
+                            {analytics?.pendingReviews || 0}
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -453,25 +597,41 @@ export default function JudgeDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/cases">
                         <Eye className="h-6 w-6" />
                         <span className="text-sm">Review Cases</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/aicounsel">
                         <MessageSquare className="h-6 w-6" />
                         <span className="text-sm">AI Counsel</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/dashboard/judge#analytics">
                         <BarChart3 className="h-6 w-6" />
                         <span className="text-sm">Analytics</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/settings">
                         <Settings className="h-6 w-6" />
                         <span className="text-sm">Settings</span>
@@ -489,7 +649,7 @@ export default function JudgeDashboard() {
       <FloatingChatbot
         userId={currentUser.username}
         userRole="judge"
-        activeCaseIds={cases.map(c => c._id)}
+        activeCaseIds={cases.map((c) => c._id)}
       />
     </SidebarProvider>
   );

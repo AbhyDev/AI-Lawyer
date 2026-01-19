@@ -1,21 +1,24 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Optional
-from pydantic import BaseModel
-import json
-from agent import classified_data
-from pathlib import Path
-from uuid import uuid4
 import hashlib
+import json
 import shutil
+from pathlib import Path
+from typing import List, Optional
+from uuid import uuid4
+
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+from agent import classified_data
 
 # Import RAG functions
 from rag import (
-    fetch_case_from_mongodb,
-    extract_text_from_case,
     create_vector_store,
-    query_rag_system,
+    extract_text_from_case,
+    fetch_case_from_mongodb,
     global_retriever,
+    query_rag_system,
+    reload_vector_stores,
 )
 
 app = FastAPI()
@@ -234,9 +237,48 @@ async def load_case_to_vector_store(request: RAGLoadRequest):
 
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error in /rag/load: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+class RAGReloadResponse(BaseModel):
+    """Response model for /rag/reload endpoint."""
+
+    success: bool
+    message: str
+    vector_stores_count: int = 0
+
+
+@app.post("/rag/reload", response_model=RAGReloadResponse)
+async def reload_rag_vector_stores():
+    """
+    Manually reload all vector stores.
+    This should be called if the RAG query doesn't see newly created vector stores.
+
+    Returns:
+        Success status and count of loaded vector stores
+    """
+    try:
+        reload_vector_stores()
+
+        # Count vector stores
+        from rag import VECTOR_STORE_DIR
+        vector_store_dirs = [
+            d for d in VECTOR_STORE_DIR.iterdir()
+            if d.is_dir() and d.name.startswith("case_")
+        ]
+
+        return RAGReloadResponse(
+            success=True,
+            message="Successfully reloaded all vector stores",
+            vector_stores_count=len(vector_store_dirs),
+        )
+    except Exception as e:
+        print(f"Error in /rag/reload: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to reload vector stores: {str(e)}")
 
 
 class RAGQueryRequest(BaseModel):
@@ -265,12 +307,12 @@ async def query_rag(request: RAGQueryRequest):
     Returns:
         AI assistant's response based on the vector database
     """
+    query = request.query
+
+    if not query or not query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty")
+
     try:
-        query = request.query
-
-        if not query or not query.strip():
-            raise HTTPException(status_code=400, detail="Query cannot be empty")
-
         print(f"Processing RAG query: {query}")
 
         # Query the RAG system
@@ -280,6 +322,8 @@ async def query_rag(request: RAGQueryRequest):
 
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Error in /rag/query: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

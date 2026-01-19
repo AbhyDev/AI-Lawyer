@@ -102,7 +102,7 @@ export async function sendToProcessingServer(data, files = []) {
     console.log(
       `Preparing to send ${files.evidences?.length || 0} evidence files and ${
         files.fullDocs?.length || 0
-      } full doc files`
+      } full doc files`,
     );
 
     // Add evidence files - all with the same field name "Evidence"
@@ -111,7 +111,7 @@ export async function sendToProcessingServer(data, files = []) {
       console.log("Evidence files to send:");
       files.evidences.forEach((file, index) => {
         console.log(
-          `  [${index}] fileId: ${file.fileId}, fileName: ${file.fileName}, originalName: ${file.originalName}`
+          `  [${index}] fileId: ${file.fileId}, fileName: ${file.fileName}, originalName: ${file.originalName}`,
         );
       });
 
@@ -121,14 +121,14 @@ export async function sendToProcessingServer(data, files = []) {
             file.originalName || file.fileName || `evidence_${index}`;
           if (file.filePath && fs.existsSync(file.filePath)) {
             console.log(
-              `Attaching evidence file: ${filename} from ${file.filePath}`
+              `Attaching evidence file: ${filename} from ${file.filePath}`,
             );
             formData.append(
               "Evidence", // Same field name for all evidence files
               fs.createReadStream(file.filePath),
               {
                 filename: filename,
-              }
+              },
             );
           } else if (file.buffer) {
             // buffer may be a Buffer or arraybuffer; ensure Buffer
@@ -141,7 +141,7 @@ export async function sendToProcessingServer(data, files = []) {
             });
           } else {
             console.warn(
-              `Evidence file missing: ${file.filePath} and no buffer available - skipping`
+              `Evidence file missing: ${file.filePath} and no buffer available - skipping`,
             );
           }
         } catch (err) {
@@ -156,7 +156,7 @@ export async function sendToProcessingServer(data, files = []) {
       console.log("Full doc files to send:");
       files.fullDocs.forEach((file, index) => {
         console.log(
-          `  [${index}] fileId: ${file.fileId}, fileName: ${file.fileName}, originalName: ${file.originalName}`
+          `  [${index}] fileId: ${file.fileId}, fileName: ${file.fileName}, originalName: ${file.originalName}`,
         );
       });
 
@@ -166,14 +166,14 @@ export async function sendToProcessingServer(data, files = []) {
             file.originalName || file.fileName || `full_doc_${index}`;
           if (file.filePath && fs.existsSync(file.filePath)) {
             console.log(
-              `Attaching full doc file: ${filename} from ${file.filePath}`
+              `Attaching full doc file: ${filename} from ${file.filePath}`,
             );
             formData.append(
               "Full_docs", // Same field name for all full doc files
               fs.createReadStream(file.filePath),
               {
                 filename: filename,
-              }
+              },
             );
           } else if (file.buffer) {
             const buf = Buffer.isBuffer(file.buffer)
@@ -185,7 +185,7 @@ export async function sendToProcessingServer(data, files = []) {
             });
           } else {
             console.warn(
-              `Full doc missing: ${file.filePath} and no buffer available - skipping`
+              `Full doc missing: ${file.filePath} and no buffer available - skipping`,
             );
           }
         } catch (err) {
@@ -194,9 +194,9 @@ export async function sendToProcessingServer(data, files = []) {
       });
     }
 
-    // Send to processing server
+    // Send to processing server (FastAPI /classify endpoint)
     const processingServerUrl =
-      process.env.PROCESSING_SERVER_URL || "http://localhost:8000/process";
+      process.env.PROCESSING_SERVER_URL || "http://localhost:8000/classify";
 
     console.log(`Sending case data to: ${processingServerUrl}`);
     const response = await axios.post(processingServerUrl, formData, {

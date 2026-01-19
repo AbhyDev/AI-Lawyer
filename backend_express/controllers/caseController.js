@@ -62,7 +62,7 @@ export const createCase = asyncHandler(async (req, res) => {
     
     // Load the case into the RAG vector store
     // This is non-blocking and won't affect response time
-    loadCaseToRAG(newCase._id.toString())
+    loadCaseToRAG(newCase.CaseID)
       .then(success => {
         if (success) {
           console.log(`Case ${newCase._id} successfully loaded into RAG system`);

@@ -1,20 +1,21 @@
+import json
 import os
 from pathlib import Path
-from typing import List, Dict, Any, TypedDict, Annotated, Sequence
-import json
+from typing import Annotated, Any, Dict, List, Sequence, TypedDict
+
 from dotenv import load_dotenv
+from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_community.vectorstores import FAISS
 
 # LangChain imports
 from langchain_core.documents import Document
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.tools import tool
-from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langgraph.graph import StateGraph, START, END
+from langchain_huggingface import HuggingFaceEmbeddings
+from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
-from langchain_community.tools.tavily_search import TavilySearchResults
 
 # MongoDB imports
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -35,9 +36,17 @@ embeddings = HuggingFaceEmbeddings(
 )
 
 # Initialize LLM
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=os.getenv("GEMINI_API_KEY"),
+# llm = ChatGoogleGenerativeAI(
+#     model="gemini-2.5-flash",
+#     google_api_key=os.getenv("GEMINI_API_KEY"),
+# )
+from langchain_groq import ChatGroq
+
+load_dotenv()
+llm = ChatGroq(
+    model="qwen/qwen3-32b",
+    api_key=os.getenv("GROQ_API_KEY"),
+    temperature=0.7,
 )
 
 
@@ -260,6 +269,9 @@ def create_vector_store(documents: List[Document], case_id: str) -> str:
     store_path = get_vector_store_path(case_id)
     vector_store.save_local(str(store_path))
 
+    # Reload all vector stores to include the new one
+    reload_vector_stores()
+
     return str(store_path)
 
 
@@ -321,6 +333,20 @@ def load_all_vector_stores() -> FAISS:
 
 # Global variable to store the vector store retriever
 global_retriever = None
+
+
+def reload_vector_stores() -> None:
+    """
+    Reload all vector stores and update the global retriever.
+    This should be called after a new vector store is created.
+    """
+    global global_retriever
+    try:
+        global_retriever = load_all_vector_stores()
+        print("Successfully reloaded all vector stores")
+    except Exception as e:
+        print(f"Error reloading vector stores: {e}")
+        global_retriever = None
 
 
 @tool

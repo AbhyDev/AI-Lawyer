@@ -1,10 +1,11 @@
 # analyse.py
 
-import os
 import base64
+import os
+
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -29,7 +30,7 @@ def analyse(image_path: str) -> str:
 
     # Initialize the LangChain model with gemini-1.5-flash
     # It will automatically use the GOOGLE_API_KEY from the environment
-    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
 
     message = HumanMessage(
         content=[

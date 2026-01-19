@@ -8,6 +8,7 @@ import {
 } from "../services/telegramService.js";
 import { BOT_STATES, BOT_MESSAGES } from "../constants/botStates.js";
 import { Case } from "../schemas/caseSchema.js";
+import { loadCaseToRAG } from "./ragController.js";
 
 /**
  * Initialize or get session from Redis
@@ -123,7 +124,7 @@ async function handleEvidences(chatId, text, document) {
     if (session.evidences.length === 0) {
       await sendMessage(
         chatId,
-        "⚠️ Please send at least one evidence document before typing 'DONE'."
+        "⚠️ Please send at least one evidence document before typing 'DONE'.",
       );
       return;
     }
@@ -139,16 +140,16 @@ async function handleEvidences(chatId, text, document) {
     try {
       // Check if this file_id has already been processed
       const existingFile = session.evidences.find(
-        (f) => f.fileId === document.file_id
+        (f) => f.fileId === document.file_id,
       );
 
       if (existingFile) {
         console.log(
-          `Skipping duplicate evidence file: ${document.file_id} (${document.file_name})`
+          `Skipping duplicate evidence file: ${document.file_id} (${document.file_name})`,
         );
         await sendMessage(
           chatId,
-          "⚠️ This file has already been uploaded. Send a different file or type 'DONE'."
+          "⚠️ This file has already been uploaded. Send a different file or type 'DONE'.",
         );
         return;
       }
@@ -161,13 +162,13 @@ async function handleEvidences(chatId, text, document) {
       console.error("Error downloading evidence:", error);
       await sendMessage(
         chatId,
-        "❌ Failed to download the document. Please try again."
+        "❌ Failed to download the document. Please try again.",
       );
     }
   } else {
     await sendMessage(
       chatId,
-      "Please send a document or type 'DONE' when finished."
+      "Please send a document or type 'DONE' when finished.",
     );
   }
 }
@@ -182,7 +183,7 @@ async function handleFullDocs(chatId, text, document) {
     if (session.fullDocs.length === 0) {
       await sendMessage(
         chatId,
-        "⚠️ Please send at least one case document before typing 'DONE'."
+        "⚠️ Please send at least one case document before typing 'DONE'.",
       );
       return;
     }
@@ -200,16 +201,16 @@ async function handleFullDocs(chatId, text, document) {
     try {
       // Check if this file_id has already been processed
       const existingFile = session.fullDocs.find(
-        (f) => f.fileId === document.file_id
+        (f) => f.fileId === document.file_id,
       );
 
       if (existingFile) {
         console.log(
-          `Skipping duplicate full doc file: ${document.file_id} (${document.file_name})`
+          `Skipping duplicate full doc file: ${document.file_id} (${document.file_name})`,
         );
         await sendMessage(
           chatId,
-          "⚠️ This file has already been uploaded. Send a different file or type 'DONE'."
+          "⚠️ This file has already been uploaded. Send a different file or type 'DONE'.",
         );
         return;
       }
@@ -222,13 +223,13 @@ async function handleFullDocs(chatId, text, document) {
       console.error("Error downloading document:", error);
       await sendMessage(
         chatId,
-        "❌ Failed to download the document. Please try again."
+        "❌ Failed to download the document. Please try again.",
       );
     }
   } else {
     await sendMessage(
       chatId,
-      "Please send a document or type 'DONE' when finished."
+      "Please send a document or type 'DONE' when finished.",
     );
   }
 }
@@ -272,6 +273,27 @@ async function processCase(chatId) {
 
     await newCase.save();
 
+    // Load the case into the RAG vector store for AI-powered search
+    // This is non-blocking and won't affect response time
+    loadCaseToRAG(caseID)
+      .then((success) => {
+        if (success) {
+          console.log(
+            `[Telegram] Case ${caseID} successfully loaded into RAG system`,
+          );
+        } else {
+          console.error(
+            `[Telegram] Failed to load case ${caseID} into RAG system`,
+          );
+        }
+      })
+      .catch((error) => {
+        console.error(
+          `[Telegram] Error in RAG loading for case ${caseID}:`,
+          error,
+        );
+      });
+
     // Send success message
     const summaryMessage = `
 ${BOT_MESSAGES.SUCCESS}
@@ -311,7 +333,7 @@ Your case has been successfully created and sent for processing!
       });
       await sendMessage(
         chatId,
-        "You can start a new case by sending 'hi' or 'hello'."
+        "You can start a new case by sending 'hi' or 'hello'.",
       );
     }, 2000);
   } catch (error) {
@@ -390,7 +412,7 @@ export async function handleWebhook(req, res) {
       case BOT_STATES.COMPLETED:
         await sendMessage(
           chatId,
-          "Your case is complete. Send 'hi' or 'hello' to start a new case."
+          "Your case is complete. Send 'hi' or 'hello' to start a new case.",
         );
         break;
 

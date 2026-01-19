@@ -10,7 +10,7 @@ const PersonDetailSchema = new mongoose.Schema(
     email_address: { type: String },
     address: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // ALL Fields are now list of Strings
@@ -27,7 +27,7 @@ const EvidenceClassSchema = new mongoose.Schema(
     expert_opinions: { type: [String] },
     physical_object_descriptions: { type: [String] },
   },
-  { _id: false }
+  { _id: false },
 );
 
 // contains evidence_summary, confidential_contacts, privileged_communications, legal_strategy_and_notes
@@ -41,7 +41,7 @@ const PrivateSectionSchema = new mongoose.Schema(
     },
     legal_strategy_and_notes: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const PublicSectionSchema = new mongoose.Schema(
@@ -65,12 +65,13 @@ const PublicSectionSchema = new mongoose.Schema(
       },
     ],
   },
-  { _id: false }
+  { _id: false },
 );
 
 const CaseSchema = new mongoose.Schema(
   {
     CaseID: { type: String, required: true, unique: true, index: true },
+    CaseName: { type: String, default: "Untitled Case" }, // LLM-generated case title for display
     LawyerID: { type: String, required: true, index: true },
     JudgeID: { type: String, required: true, index: true },
     UserID: { type: String, required: true, index: true },
@@ -78,7 +79,7 @@ const CaseSchema = new mongoose.Schema(
     Private: { type: PrivateSectionSchema },
     Public: { type: PublicSectionSchema },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Case = mongoose.model("Case", CaseSchema);
