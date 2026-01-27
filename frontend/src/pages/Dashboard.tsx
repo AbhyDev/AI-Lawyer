@@ -1,22 +1,38 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { 
-  Scale, 
-  FileText, 
-  Upload, 
-  MessageSquare, 
-  Bell, 
-  Settings, 
+import {
+  Scale,
+  FileText,
+  Upload,
+  MessageSquare,
+  Bell,
+  Settings,
   LayoutDashboard,
   User,
   Search,
   Clock,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -32,9 +48,24 @@ const Dashboard = () => {
   ];
 
   const recentCases = [
-    { id: "452/2024", title: "Contract Dispute - ABC Corp", status: "Active", updated: "2 hours ago" },
-    { id: "453/2024", title: "Property Rights - Sharma vs Kumar", status: "Pending Review", updated: "5 hours ago" },
-    { id: "454/2024", title: "Employment Law - Tech Solutions Ltd", status: "Active", updated: "1 day ago" },
+    {
+      id: "452/2024",
+      title: "Contract Dispute - ABC Corp",
+      status: "Active",
+      updated: "2 hours ago",
+    },
+    {
+      id: "453/2024",
+      title: "Property Rights - Sharma vs Kumar",
+      status: "Pending Review",
+      updated: "5 hours ago",
+    },
+    {
+      id: "454/2024",
+      title: "Employment Law - Tech Solutions Ltd",
+      status: "Active",
+      updated: "1 day ago",
+    },
   ];
 
   const upcomingHearings = [
@@ -59,8 +90,12 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               <Scale className="h-6 w-6 text-sidebar-primary" />
               <div>
-                <h1 className="text-lg font-bold text-sidebar-foreground">UDAAN</h1>
-                <p className="text-xs text-sidebar-foreground/70">Justice Portal</p>
+                <h1 className="text-lg font-bold text-sidebar-foreground">
+                  UDAAN
+                </h1>
+                <p className="text-xs text-sidebar-foreground/70">
+                  Justice Portal
+                </p>
               </div>
             </div>
           </div>
@@ -124,9 +159,14 @@ const Dashboard = () => {
           <main className="flex-1 p-6 overflow-auto">
             <div className="max-w-7xl mx-auto space-y-6">
               {/* Welcome Banner */}
-              <div className="bg-gradient-hero text-primary-foreground rounded-lg p-6">
-                <h2 className="text-2xl font-bold mb-2">Welcome back, Adv. Rajesh Kumar</h2>
-                <p className="text-primary-foreground/90">You have 5 upcoming hearings this week and 8 documents pending review.</p>
+              <div className="bg-gradient-hero text-primary rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-2">
+                  Welcome back, Adv. Rajesh Kumar
+                </h2>
+                <p className="text-primary-foreground/90">
+                  You have 5 upcoming hearings this week and 8 documents pending
+                  review.
+                </p>
               </div>
 
               {/* Stats Grid */}
@@ -142,7 +182,10 @@ const Dashboard = () => {
                     <CardContent>
                       <div className="text-2xl font-bold">{stat.value}</div>
                       <p className="text-xs text-muted-foreground mt-1">
-                        <span className="text-accent font-medium">{stat.trend}</span> from last week
+                        <span className="text-accent font-medium">
+                          {stat.trend}
+                        </span>{" "}
+                        from last week
                       </p>
                     </CardContent>
                   </Card>
@@ -155,19 +198,32 @@ const Dashboard = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Recent Cases</CardTitle>
-                    <CardDescription>Your most recently updated cases</CardDescription>
+                    <CardDescription>
+                      Your most recently updated cases
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {recentCases.map((case_) => (
-                        <div key={case_.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer">
+                        <div
+                          key={case_.id}
+                          className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
+                        >
                           <div className="flex-1">
-                            <div className="font-medium text-sm">{case_.title}</div>
-                            <div className="text-xs text-muted-foreground mt-1">Case #{case_.id}</div>
+                            <div className="font-medium text-sm">
+                              {case_.title}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Case #{case_.id}
+                            </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-xs font-medium text-accent">{case_.status}</div>
-                            <div className="text-xs text-muted-foreground mt-1">{case_.updated}</div>
+                            <div className="text-xs font-medium text-accent">
+                              {case_.status}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {case_.updated}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -182,19 +238,30 @@ const Dashboard = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Upcoming Hearings</CardTitle>
-                    <CardDescription>Your scheduled court appearances</CardDescription>
+                    <CardDescription>
+                      Your scheduled court appearances
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {upcomingHearings.map((hearing, index) => (
-                        <div key={index} className="flex items-start gap-3 p-3 rounded-lg border border-border">
+                        <div
+                          key={index}
+                          className="flex items-start gap-3 p-3 rounded-lg border border-border"
+                        >
                           <div className="h-10 w-10 rounded-lg bg-secondary/20 flex items-center justify-center flex-shrink-0">
                             <Clock className="h-5 w-5 text-secondary" />
                           </div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Case #{hearing.case}</div>
-                            <div className="text-xs text-muted-foreground mt-1">{hearing.court}</div>
-                            <div className="text-xs font-medium text-primary mt-1">{hearing.date}</div>
+                            <div className="font-medium text-sm">
+                              Case #{hearing.case}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {hearing.court}
+                            </div>
+                            <div className="text-xs font-medium text-primary mt-1">
+                              {hearing.date}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -214,25 +281,41 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/upload">
                         <Upload className="h-6 w-6" />
                         <span className="text-sm">Upload Document</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/ai-counsel">
                         <MessageSquare className="h-6 w-6" />
                         <span className="text-sm">Ask AI Counsel</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/cases">
                         <FileText className="h-6 w-6" />
                         <span className="text-sm">New Case</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/settings">
                         <Settings className="h-6 w-6" />
                         <span className="text-sm">Settings</span>

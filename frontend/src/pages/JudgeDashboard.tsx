@@ -235,11 +235,11 @@ export default function JudgeDashboard() {
           <main className="flex-1 p-6 overflow-auto">
             <div className="max-w-7xl mx-auto space-y-6">
               {/* Welcome Banner */}
-              <div className="bg-gradient-hero text-primary-foreground rounded-lg p-6">
+              <div className="bg-gradient-hero text-primary rounded-lg p-6">
                 <h2 className="text-2xl font-bold mb-2">
                   Good day, Your Honor
                 </h2>
-                <p className="text-primary-foreground/90">
+                <p className="text-primary/90">
                   You have {analytics?.pendingReviews || 0} cases pending
                   review. {analytics?.completedThisMonth || 0} cases completed
                   this month.

@@ -262,13 +262,11 @@ export default function CitizenDashboard() {
           <main className="flex-1 p-6 overflow-auto">
             <div className="max-w-5xl mx-auto space-y-6">
               {/* Welcome Banner */}
-              <div className="bg-gradient-hero text-primary-foreground rounded-lg p-6">
+              <div className="bg-gradient-hero text-primary rounded-lg p-6">
                 <h2 className="text-2xl font-bold mb-2">
                   {t.welcome}, {userName}!
                 </h2>
-                <p className="text-primary-foreground/90 text-lg">
-                  {t.welcomeMessage}
-                </p>
+                <p className="text-primary/90 text-lg">{t.welcomeMessage}</p>
               </div>
 
               {/* Quick Summary Cards */}

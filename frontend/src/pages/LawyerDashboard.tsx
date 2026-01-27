@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,10 +30,20 @@ import {
   AlertCircle,
   Calendar,
   FolderOpen,
-  LogOut
+  LogOut,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "@/components/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
 import { FloatingChatbot } from "@/components/FloatingChatbot";
 import { fetchCases, fetchAnalytics, type Case } from "@/lib/api";
 
@@ -38,7 +54,7 @@ export default function LawyerDashboard() {
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-    // Get current user from localStorage
+  // Get current user from localStorage
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
   const userName = currentUser.username || "Advocate";
 
@@ -51,7 +67,7 @@ export default function LawyerDashboard() {
     try {
       const [casesData, analyticsData] = await Promise.all([
         fetchCases(),
-        fetchAnalytics()
+        fetchAnalytics(),
       ]);
       console.log("Fetched cases:", casesData);
       setCases(casesData);
@@ -73,8 +89,11 @@ export default function LawyerDashboard() {
   ];
 
   const upcomingHearings = cases
-    .filter(c => c.nextHearing)
-    .sort((a, b) => new Date(a.nextHearing!).getTime() - new Date(b.nextHearing!).getTime())
+    .filter((c) => c.nextHearing)
+    .sort(
+      (a, b) =>
+        new Date(a.nextHearing!).getTime() - new Date(b.nextHearing!).getTime(),
+    )
     .slice(0, 3);
 
   const recentCases = cases.slice(0, 5);
@@ -94,8 +113,12 @@ export default function LawyerDashboard() {
             <div className="flex items-center gap-2">
               <Scale className="h-6 w-6 text-sidebar-primary" />
               <div>
-                <h1 className="text-lg font-bold text-sidebar-foreground">UDAAN</h1>
-                <p className="text-xs text-sidebar-foreground/70">Lawyer Portal</p>
+                <h1 className="text-lg font-bold text-sidebar-foreground">
+                  UDAAN
+                </h1>
+                <p className="text-xs text-sidebar-foreground/70">
+                  Lawyer Portal
+                </p>
               </div>
             </div>
           </div>
@@ -154,7 +177,9 @@ export default function LawyerDashboard() {
                       </div>
                       <div className="text-sm text-left">
                         <div className="font-medium">{userName}</div>
-                        <div className="text-xs text-muted-foreground">Lawyer</div>
+                        <div className="text-xs text-muted-foreground">
+                          Lawyer
+                        </div>
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
@@ -182,10 +207,13 @@ export default function LawyerDashboard() {
           <main className="flex-1 p-6 overflow-auto">
             <div className="max-w-7xl mx-auto space-y-6">
               {/* Welcome Banner */}
-              <div className="bg-gradient-hero text-primary-foreground rounded-lg p-6">
-                <h2 className="text-2xl font-bold mb-2">Welcome back, {userName.split('.')[1] || userName}</h2>
-                <p className="text-primary-foreground/90">
-                  You have {analytics?.upcomingHearings || 0} upcoming hearings and {analytics?.pendingReviews || 0} documents pending review.
+              <div className="bg-gradient-hero text-primary rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-2">
+                  Welcome back, {userName.split(".")[1] || userName}
+                </h2>
+                <p className="text-primary/90">
+                  You have {analytics?.upcomingHearings || 0} upcoming hearings
+                  and {analytics?.pendingReviews || 0} documents pending review.
                 </p>
               </div>
 
@@ -199,8 +227,12 @@ export default function LawyerDashboard() {
                     <FileText className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{analytics?.activeCases || 0}</div>
-                    <p className="text-xs text-muted-foreground mt-1">Cases you're handling</p>
+                    <div className="text-2xl font-bold">
+                      {analytics?.activeCases || 0}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Cases you're handling
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -212,8 +244,12 @@ export default function LawyerDashboard() {
                     <Clock className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{analytics?.pendingReviews || 0}</div>
-                    <p className="text-xs text-muted-foreground mt-1">Documents to review</p>
+                    <div className="text-2xl font-bold">
+                      {analytics?.pendingReviews || 0}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Documents to review
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -225,8 +261,12 @@ export default function LawyerDashboard() {
                     <Bell className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{analytics?.upcomingHearings || 0}</div>
-                    <p className="text-xs text-muted-foreground mt-1">This week</p>
+                    <div className="text-2xl font-bold">
+                      {analytics?.upcomingHearings || 0}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This week
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -238,8 +278,12 @@ export default function LawyerDashboard() {
                     <Upload className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{analytics?.documentsUploaded || 0}</div>
-                    <p className="text-xs text-muted-foreground mt-1">This month</p>
+                    <div className="text-2xl font-bold">
+                      {analytics?.documentsUploaded || 0}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This month
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -250,12 +294,16 @@ export default function LawyerDashboard() {
                 <Card>
                   <CardHeader>
                     <CardTitle>My Cases</CardTitle>
-                    <CardDescription>Cases you're currently handling</CardDescription>
+                    <CardDescription>
+                      Cases you're currently handling
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       {loading ? (
-                        <p className="text-sm text-muted-foreground">Loading cases...</p>
+                        <p className="text-sm text-muted-foreground">
+                          Loading cases...
+                        </p>
                       ) : recentCases.length > 0 ? (
                         recentCases.map((case_) => (
                           <div
@@ -265,7 +313,9 @@ export default function LawyerDashboard() {
                           >
                             <FolderOpen className="h-5 w-5 text-primary mt-0.5" />
                             <div className="flex-1">
-                              <div className="font-medium text-sm">{case_.title}</div>
+                              <div className="font-medium text-sm">
+                                {case_.title}
+                              </div>
                               <div className="text-xs text-muted-foreground mt-1">
                                 Case #{case_._id} • {case_.court}
                               </div>
@@ -276,7 +326,9 @@ export default function LawyerDashboard() {
                           </div>
                         ))
                       ) : (
-                        <p className="text-sm text-muted-foreground">No cases found</p>
+                        <p className="text-sm text-muted-foreground">
+                          No cases found
+                        </p>
                       )}
                       <Button variant="outline" className="w-full" asChild>
                         <Link to="/cases">View All Cases</Link>
@@ -292,7 +344,9 @@ export default function LawyerDashboard() {
                       <Calendar className="h-5 w-5" />
                       Upcoming Hearings & Deadlines
                     </CardTitle>
-                    <CardDescription>Stay on top of your schedule</CardDescription>
+                    <CardDescription>
+                      Stay on top of your schedule
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -306,18 +360,24 @@ export default function LawyerDashboard() {
                               <AlertCircle className="h-5 w-5 text-accent" />
                             </div>
                             <div className="flex-1">
-                              <div className="font-medium text-sm">Case #{hearing._id}</div>
+                              <div className="font-medium text-sm">
+                                Case #{hearing._id}
+                              </div>
                               <div className="text-xs text-muted-foreground mt-1">
                                 {hearing.court}
                               </div>
                               <div className="text-xs font-medium text-primary mt-1">
-                                {new Date(hearing.nextHearing!).toLocaleString()}
+                                {new Date(
+                                  hearing.nextHearing!,
+                                ).toLocaleString()}
                               </div>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <p className="text-sm text-muted-foreground">No upcoming hearings</p>
+                        <p className="text-sm text-muted-foreground">
+                          No upcoming hearings
+                        </p>
                       )}
                       <Button variant="outline" className="w-full" asChild>
                         <Link to="/alerts">View All Alerts</Link>
@@ -335,25 +395,41 @@ export default function LawyerDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/upload">
                         <Upload className="h-6 w-6" />
                         <span className="text-sm">Upload Document</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/aicounsel">
                         <MessageSquare className="h-6 w-6" />
                         <span className="text-sm">AI Counsel</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/cases">
                         <FileText className="h-6 w-6" />
                         <span className="text-sm">View Cases</span>
                       </Link>
                     </Button>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2" asChild>
+                    <Button
+                      variant="outline"
+                      className="h-auto py-4 flex flex-col gap-2"
+                      asChild
+                    >
                       <Link to="/settings">
                         <Settings className="h-6 w-6" />
                         <span className="text-sm">Settings</span>
@@ -371,7 +447,7 @@ export default function LawyerDashboard() {
       <FloatingChatbot
         userId={currentUser.username}
         userRole="lawyer"
-        activeCaseIds={cases.map(c => c._id)}
+        activeCaseIds={cases.map((c) => c._id)}
       />
     </SidebarProvider>
   );
